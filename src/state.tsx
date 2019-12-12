@@ -7,7 +7,7 @@ import {
   useState
 } from "preact/hooks";
 import { memo } from "preact/compat";
-import { FunctionalComponent } from "preact";
+import { FunctionalComponent, Ref, RefObject } from "preact";
 
 export class Point {
   x: number;
@@ -17,13 +17,39 @@ export class Point {
     this.x = x;
     this.y = y;
   }
+
+  distanceTo(b: Point): number {
+    const x = this.x - b.x;
+    const y = this.y - b.y;
+    return Math.sqrt(x * x + y * y);
+  }
+
+  angleTo(b: Point): number {
+    // let x = this.x - b.x;
+    // let y = this.y - b.y;
+    // const mag = Math.sqrt(x * x + y * y);
+    // x /= mag;
+    // y /= mag;
+
+    return Math.atan2(this.y - b.y, this.x - b.x);
+  }
 }
 
+let lastId = 0;
+
 export class BlockState {
+  id: number;
   center: Point;
+  outputs: BlockState[] = [];
+  ref: RefObject<HTMLDivElement> = { current: undefined };
 
   constructor(x: number, y: number) {
+    this.id = ++lastId;
     this.center = new Point(x, y);
+  }
+
+  linkTo(b: BlockState) {
+    this.outputs.push(b);
   }
 }
 
@@ -73,14 +99,15 @@ export function view<T>(Comp: FunctionalComponent<T>): FunctionalComponent<T> {
 
 export const state = observable(new State());
 
-observe(() => {
-  console.log("manual", state.blocks.length);
-});
+const a = new BlockState(250, 200);
+const b = new BlockState(50, 100);
+const c = new BlockState(450, 100);
 
-setTimeout(() => {
-  state.blocks.push(observable(new BlockState(200, 200)));
-}, 1000);
+state.blocks.push(a, b, c);
 
-setTimeout(() => {
-  state.blocks.push(observable(new BlockState(100, 100)));
-}, 2000);
+a.linkTo(b);
+c.linkTo(a);
+a.linkTo(c);
+setTimeout(() => {}, 1000);
+
+setTimeout(() => {}, 2000);

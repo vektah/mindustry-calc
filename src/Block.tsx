@@ -2,8 +2,6 @@ import { ComponentChildren, h } from "preact";
 import Draggable from "./useDraggable";
 import { BlockState, view } from "./state";
 
-type Parameters<T> = T extends (...args: infer T) => any ? T : never;
-
 function Outputs({ children }: { children?: ComponentChildren }) {
   return <div class="block-outputs">{children}</div>;
 }
@@ -20,9 +18,9 @@ function Node({ children }: { children?: ComponentChildren }) {
   return <div class="block-node">{children}</div>;
 }
 
-const Block = view(({ block }: { block: BlockState }) => {
+function Block({ block }: { block: BlockState }) {
   return (
-    <Draggable className="block" pos={block.center}>
+    <Draggable className="block" pos={block.center} ref={block.ref}>
       <Outputs>
         <Node />
       </Outputs>
@@ -33,5 +31,5 @@ const Block = view(({ block }: { block: BlockState }) => {
       </Inputs>
     </Draggable>
   );
-});
-export default Block;
+}
+export default view(Block);

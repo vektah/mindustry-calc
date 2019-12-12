@@ -33,7 +33,6 @@ function Draggable({
 
         mouseMove.current = e => {
           e.preventDefault();
-          console.log("set ", e.clientX - startX);
           pos.x = e.clientX - startX;
           pos.y = e.clientY - startY;
         };

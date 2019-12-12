@@ -44,3 +44,11 @@
 .root {
     position: relative;
 }
+
+.connector {
+    position: absolute;
+    border-left: 1px dashed red;
+    background-color: blue;
+    transform-origin: 0% 50%;
+
+}
