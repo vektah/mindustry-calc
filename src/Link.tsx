@@ -6,9 +6,8 @@ function Link({ a, b }: { a: BlockState; b: BlockState }) {
   const dist = a.center.distanceTo(b.center);
   return (
     <div
-      className="connector"
+      className="link"
       style={{
-        height: 10,
         width: dist,
         top: a.center.y,
         left: a.center.x,

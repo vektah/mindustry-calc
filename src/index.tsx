@@ -6,11 +6,10 @@ import Link from "./Link";
 const App = view(() => {
   return (
     <div className="root">
+      {state.blocks.map(a => a.outputs.map(b => <Link a={a} b={b} />))}
       {state.blocks.map(b => (
         <Block block={b} />
       ))}
-
-      {state.blocks.map(a => a.outputs.map(b => <Link a={a} b={b} />))}
     </div>
   );
 });
