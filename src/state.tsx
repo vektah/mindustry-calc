@@ -8,6 +8,7 @@ import {
 } from "preact/hooks";
 import { memo } from "preact/compat";
 import { FunctionalComponent, Ref, RefObject } from "preact";
+import items from "./game/Items";
 
 export class Point {
   x: number;
@@ -25,12 +26,6 @@ export class Point {
   }
 
   angleTo(b: Point): number {
-    // let x = this.x - b.x;
-    // let y = this.y - b.y;
-    // const mag = Math.sqrt(x * x + y * y);
-    // x /= mag;
-    // y /= mag;
-
     return Math.atan2(this.y - b.y, this.x - b.x);
   }
 }
