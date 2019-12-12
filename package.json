@@ -1,0 +1,20 @@
+{
+  "name": "minidustry",
+  "version": "0.1.0",
+  "private": true,
+  "devDependencies": {
+    "sass": "^1.23.7",
+    "typescript": "^3.7.3",
+    "prettier": "^1.19.1",
+    "@types/d3": "^5.7.2"
+  },
+  "dependencies": {
+    "@nx-js/observer-util": "^4.2.2",
+    "d3": "^5.14.2",
+    "normalize.css": "^8.0.1",
+    "preact": "^10.1.0"
+  },
+  "scripts": {
+    "dev": "parcel index.html"
+  }
+}

@@ -1,0 +1,46 @@
+@import 'normalize.css/normalize.css';
+
+.block {
+    position: absolute;
+    width: 150px;
+    height: 150px;
+    background-color: #333;
+    border-radius: 20px;
+    display: grid;
+    grid-template-areas:
+            "out"
+            "label"
+            "input";
+
+    &-outputs {
+        grid-area: out;
+        display:flex;
+        justify-content: space-around;
+        align-items: center;
+    }
+
+    &-node {
+        width: 15px;
+        height: 15px;
+        background-color: blue;
+        border-radius: 7px;
+    }
+
+    &-inputs {
+        grid-area: input;
+        display:flex;
+        justify-content: space-around;
+        align-items: center;
+    }
+
+    &-label {
+        grid-area: label;
+        display:flex;
+        justify-content: space-around;
+        align-items: center;
+    }
+}
+
+.root {
+    position: relative;
+}
