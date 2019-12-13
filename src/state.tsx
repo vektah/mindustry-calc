@@ -1,16 +1,10 @@
 import { observable, observe, unobserve } from "@nx-js/observer-util";
-import {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from "preact/hooks";
+import { useEffect, useMemo, useState } from "preact/hooks";
 import { memo } from "preact/compat";
-import { FunctionalComponent, Ref, RefObject } from "preact";
-import items from "./game/Items";
+import { FunctionalComponent, h, RefObject } from "preact";
 import GenericCrafter from "./game/GenericCrafter";
 import Blocks from "./game/Blocks";
+import ItemStack from "./game/ItemStack";
 
 export class Point {
   x: number;
@@ -34,10 +28,17 @@ export class Point {
 
 let lastId = 0;
 
+export interface Link {
+  source: BlockState;
+  dest: BlockState;
+  item: ItemStack;
+}
+
 export class BlockState {
   id: number;
   center: Point;
-  outputs: BlockState[] = [];
+  outputs: Link[] = [];
+  inputs: Link[] = [];
   ref: RefObject<HTMLDivElement> = { current: undefined };
   recipe: GenericCrafter;
   count = 1;
@@ -49,7 +50,28 @@ export class BlockState {
   }
 
   linkTo(b: BlockState) {
-    this.outputs.push(b);
+    const outputs = this.recipe.outputRate({ machines: this.count });
+    const inputs = b.recipe.inputRate({ machines: b.count });
+
+    outputs.forEach(output =>
+      inputs.forEach(input => {
+        if (output.item.name != input.item.name) {
+          return;
+        }
+
+        this.outputs.push({
+          source: this,
+          dest: b,
+          item: output
+        });
+
+        b.inputs.push({
+          source: this,
+          dest: b,
+          item: output
+        });
+      })
+    );
   }
 }
 
