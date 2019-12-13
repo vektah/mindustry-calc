@@ -1,7 +1,3 @@
-export default class LiquidConverter {
-  name: string;
+import GenericCrafter from "./GenericCrafter";
 
-  constructor(name: string, opts: {}) {
-    this.name = name;
-  }
-}
+export default class LiquidConverter extends GenericCrafter {}

@@ -1,13 +1,8 @@
 import Liquid from "./Liquid";
+import ItemStack from "./ItemStack";
 
-export default class LiquidStack {
-  liquid: Liquid;
-  count: number;
-
+export default class LiquidStack extends ItemStack {
   constructor(liquid: Liquid, count: number) {
-    this.liquid = liquid;
-    this.count = count;
+    super(liquid, count);
   }
-
-  static with(...args: (Liquid | number)[]) {}
 }

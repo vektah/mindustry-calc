@@ -1,9 +1,3 @@
-export default class Liquid {
-  name: string;
-  color: string;
+import { Item } from "./item";
 
-  constructor(name: string, color: string, opts: {}) {
-    this.name = name;
-    this.color = color;
-  }
-}
+export default class Liquid extends Item {}
