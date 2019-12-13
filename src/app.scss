@@ -5,6 +5,8 @@ $fill: #52616b;
 $lighter: #c9d6df;
 $text: #f0f5f9;
 $belt-border: #989aa4;
+$belt-width: 16px;
+$block-size: 64px;
 
 body {
     background-color: #212121;
@@ -13,20 +15,19 @@ body {
 
 .block {
     position: absolute;
-    width: 50px;
-    height: 50px;
+    width: $block-size;
+    height: $block-size;
     background-color: $fill;
-    border: 3px solid $belt-border;
-    border-radius: 50px;
-    display: grid;
-    transform: translate(-25px, -20px);
+    background-size: 100%;
+    border: 2px solid $belt-border;
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    text-align:center;
+    transform: translate(-$block-size/2, -$block-size/2 + $belt-width/2);
 
     &-label {
-        grid-area: label;
-        display:flex;
-        justify-content: center;
-        align-items: center;
-        text-align:center;
+        background-color: rgba(0,0,0, .5);
         font-size: 13px;
     }
 }
@@ -36,11 +37,24 @@ body {
 }
 
 .link {
-    height: 16px;
+    height: $belt-width;
     position: absolute;
     border-left: 1px dashed red;
     transform-origin: 0% 50%;
-    background: url("../public/mindustry/conveyor-0-0.png");
-    background-size: 16px 16px;
+    background: url("../public/mindustry/sprites/blocks/distribution/conveyors/conveyor-0-0.png");
+    background-size: $belt-width $belt-width;
+    box-sizing: border-box;
+    text-align: center;
     //z-index: 1;
+}
+
+.link-item {
+    height: $belt-width * 1.5;
+    width: $belt-width * 1.5;
+    transform: translate(0, -$belt-width/4);
+
+    filter: drop-shadow(1px 0 0 black)
+    drop-shadow(-1px 0 0 black)
+    drop-shadow(0 1px 0 black)
+    drop-shadow(0 -1px 0 black);
 }

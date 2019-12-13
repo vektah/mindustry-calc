@@ -9,6 +9,8 @@ import {
 import { memo } from "preact/compat";
 import { FunctionalComponent, Ref, RefObject } from "preact";
 import items from "./game/Items";
+import GenericCrafter from "./game/GenericCrafter";
+import Blocks from "./game/Blocks";
 
 export class Point {
   x: number;
@@ -37,10 +39,13 @@ export class BlockState {
   center: Point;
   outputs: BlockState[] = [];
   ref: RefObject<HTMLDivElement> = { current: undefined };
+  recipe: GenericCrafter;
+  count = 1;
 
-  constructor(x: number, y: number) {
+  constructor(x: number, y: number, recipe: GenericCrafter) {
     this.id = ++lastId;
     this.center = new Point(x, y);
+    this.recipe = recipe;
   }
 
   linkTo(b: BlockState) {
@@ -94,15 +99,13 @@ export function view<T>(Comp: FunctionalComponent<T>): FunctionalComponent<T> {
 
 export const state = observable(new State());
 
-const a = new BlockState(250, 200);
-const b = new BlockState(50, 100);
-const c = new BlockState(450, 100);
+const silicon = new BlockState(50, 100, Blocks.siliconSmelter);
+const surgeSmelter = new BlockState(450, 100, Blocks.surgeSmelter);
 
-state.blocks.push(a, b, c);
+state.blocks.push(silicon, surgeSmelter);
 
-a.linkTo(b);
-c.linkTo(a);
-a.linkTo(c);
+silicon.linkTo(surgeSmelter);
+
 setTimeout(() => {}, 1000);
 
 setTimeout(() => {}, 2000);
