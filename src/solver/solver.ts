@@ -219,14 +219,14 @@ export class Link<DataType, TemplateType extends Template> {
 }
 
 export function* solve<DataType, TemplateType extends Template>(
-  producers: Template[],
+  producers: TemplateType[],
   target: ItemCount,
-): Generator<ProductionNode<DataType, Template>> {
+): Generator<ProductionNode<DataType, TemplateType>> {
   const producerByInput = createProducerMap(producers);
   let solutions = producerByInput
     .get(target.item)
-    .map<ProductionNode<DataType, Template>[]>(template => {
-      const result = new ProductionNode<DataType, Template>(template);
+    .map<ProductionNode<DataType, TemplateType>[]>(template => {
+      const result = new ProductionNode<DataType, TemplateType>(template);
       result.linkTo(target);
       return [result, result];
     });
@@ -265,7 +265,9 @@ export function* solve<DataType, TemplateType extends Template>(
 
           let producer = consumer.find(inputTemplate);
           if (!producer) {
-            producer = new ProductionNode<DataType, Template>(inputTemplate);
+            producer = new ProductionNode<DataType, TemplateType>(
+              inputTemplate,
+            );
             incomplete.push(producer);
           }
 
@@ -301,7 +303,7 @@ export function* solve<DataType, TemplateType extends Template>(
 //   [i1m2, i2m1, i3m1],
 //   [i1m2, i2m2, i3m1],
 // ]
-export function flattenInputs(inputs: Template[][]): Template[][] {
+export function flattenInputs<T extends Template>(inputs: T[][]): T[][] {
   if (inputs.length == 0) return [];
   if (inputs.length == 1) {
     if (!inputs[0]) {
@@ -310,17 +312,17 @@ export function flattenInputs(inputs: Template[][]): Template[][] {
     return inputs[0].map(way => [way]);
   }
 
-  let results: Template[][] = [];
+  let results: T[][] = [];
   for (let way of inputs[0]) {
-    for (let rest of flattenInputs(inputs.slice(1))) {
+    for (let rest of flattenInputs<T>(inputs.slice(1))) {
       results.push([way, ...rest]);
     }
   }
   return results;
 }
 
-function createProducerMap(producers: Template[]) {
-  const producerByInput = new Map<any, Template[]>();
+function createProducerMap<T extends Template>(producers: T[]) {
+  const producerByInput = new Map<any, T[]>();
 
   for (const block of producers) {
     for (const out of block.outputs) {

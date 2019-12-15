@@ -23,8 +23,34 @@ export class Point {
     return Math.sqrt(x * x + y * y);
   }
 
+  mag(): number {
+    return Math.sqrt(this.x * this.x + this.y * this.y);
+  }
+
   angleTo(b: Point): number {
     return Math.atan2(this.y - b.y, this.x - b.x);
+  }
+
+  addThis(other: Point) {
+    this.x += other.x;
+    this.y += other.y;
+  }
+
+  sub(other: Point) {
+    return new Point(this.x - other.x, this.y - other.y);
+  }
+
+  normThis() {
+    const dist = this.mag();
+    this.x /= dist;
+    this.y /= dist;
+    return this;
+  }
+
+  scaleThis(n: number) {
+    this.x *= n;
+    this.y *= n;
+    return this;
   }
 }
 
@@ -81,19 +107,80 @@ export function view<T>(Comp: FunctionalComponent<T>): FunctionalComponent<T> {
 export const state = observable(new State());
 
 const result = Array.from(
-  solve<ViewData, GenericCrafter>(producers, new ItemStack(Items.silicon, 10)),
+  solve<ViewData, GenericCrafter>(
+    producers,
+    new ItemStack(Items.surgealloy, 10),
+  ),
 );
 
 for (const [node, depth] of result[0].walk()) {
   node.data = {
-    center: new Point(0, 0),
+    center: new Point(Math.random() * 500 + 100, Math.random() * 500 + 100),
     count: 1,
     ref: { current: undefined },
   };
   state.blocks.push(node);
 }
+// setInterval(forceLayout, 30);
+for (let i = 0; i < 100; i++) {
+  forceLayout();
+}
+
+function calcForce(a: Point, b: Point, f: (dist: number) => number) {
+  const vector = a.sub(b);
+  let correction = f(vector.mag());
+
+  return vector.normThis().scaleThis(correction);
+}
 
 function forceLayout() {
+  // setInterval(forceLayout, 100);
+  const c1 = 50;
+  const c2 = 100;
+  const c3 = 100000;
+
+  let minX = 9999999;
+  let minY = 9999999;
   for (const block of state.blocks) {
+    if (block.data.center.x < minX) {
+      minX = block.data.center.x;
+    }
+    if (block.data.center.y < minY) {
+      minY = block.data.center.y;
+    }
+  }
+
+  for (const block of state.blocks) {
+    if (block == state.blocks[0]) {
+      block.data.center.x = block.data.center.x + (-minX + 100) / 10;
+      block.data.center.y = block.data.center.y + (-minY + 100) / 10;
+      continue;
+    }
+
+    const totalCorrection = new Point(-20, 0);
+
+    for (const link of block.outputs) {
+      if (!link.destination) continue;
+      totalCorrection.addThis(
+        calcForce(
+          block.data.center,
+          link.destination.data.center,
+          d => c1 * Math.log(c2 / d),
+        ),
+      );
+    }
+
+    for (const other of state.blocks) {
+      if (block === other) continue;
+      totalCorrection.addThis(
+        calcForce(block.data.center, other.data.center, d => c3 / (d * d)),
+      );
+    }
+    block.data.center.addThis(totalCorrection);
   }
 }
+
+// @ts-ignore
+window.tick = forceLayout;
+// @ts-ignore
+window.blocks = state.blocks;
