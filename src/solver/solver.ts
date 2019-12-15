@@ -10,68 +10,67 @@ export interface ItemCount {
   count: number;
 }
 
-export class ProductionNode {
-  template: Template;
-  sources?: Link[];
-  destinations?: Link[];
+export class ProductionNode<DataType, TemplateType extends Template> {
+  template: TemplateType;
+  inputs?: Link<DataType, TemplateType>[];
+  outputs?: Link<DataType, TemplateType>[] = [];
+  data?: DataType;
 
-  constructor(template: Template, targets: ItemCount[]) {
+  constructor(template: TemplateType) {
     this.template = template;
-    this.destinations = targets.map(t => new Link(t));
-    this.sources = this.template.inputs.map(i => {
-      return new Link({
+
+    this.inputs = this.template.inputs.map(i => {
+      const link = new Link<DataType, TemplateType>({
         item: i.item,
-        count: this.requiredInputAmount(i.item)
+        count: 0,
       });
+      link.destination = this;
+      return link;
     });
   }
 
-  addDestination(
-    consumer: ProductionNode,
-    consumerIndex: number,
-    template: Template,
-    targets: ItemCount[]
+  linkTo(
+    target: ItemCount,
+    destination?: ProductionNode<DataType, TemplateType>,
   ) {
-    this.destinations.push(...targets.map(t => new Link(t, consumer)));
+    const link = new Link<DataType, TemplateType>(target);
+    link.source = this;
+    link.destination = destination;
 
-    consumer.sources[consumerIndex].destination = this;
+    this.outputs.push(link);
+    if (destination) {
+      const inputId = destination.template.inputs.findIndex(
+        i => i.item == target.item,
+      );
+      destination.inputs[inputId] = link;
+    }
 
     this.updateSourceRequirements();
   }
 
-  updateSourceRequirements(maxDepth = 200) {
+  accepts(item: any) {
+    for (const input of this.template.inputs) {
+      if (input.item == item) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private updateSourceRequirements(maxDepth = 200) {
     if (maxDepth < 0) {
       return;
     }
-    for (const s of this.sources) {
-      const amount = this.requiredInputAmount(s.required.item);
-      s.required.count = amount;
-      if (s.destination) {
-        for (const d of s.destination.destinations) {
-          if (d.destination === this && d.required.item == s.required.item) {
-            d.required.count = amount;
-          }
-        }
-        s.destination.updateSourceRequirements(maxDepth - 1);
+    for (const input of this.inputs) {
+      const amount = this.requiredInputAmount(input.required.item);
+      input.required.count = amount;
+      if (input.source) {
+        input.source.updateSourceRequirements(maxDepth - 1);
       }
     }
   }
 
-  findUp(name: string): ProductionNode | undefined {
-    if (this.template.outputs.find(f => f.item == name)) {
-      return this;
-    }
-
-    for (const d of this.destinations) {
-      if (!d.destination) continue;
-      const found = d.destination.findUp(name);
-      if (found) {
-        return found;
-      }
-    }
-  }
-
-  find(template: Template): ProductionNode {
+  find(template: Template): ProductionNode<DataType, TemplateType> {
     for (const [node, depth] of this.walk()) {
       if (node.template === template) {
         return node;
@@ -82,7 +81,7 @@ export class ProductionNode {
   requiredInputAmount(name: string): number {
     const total: { [item: string]: number } = {};
 
-    for (const dest of this.destinations) {
+    for (const dest of this.outputs) {
       total[dest.required.item] = total[dest.required.item]
         ? total[dest.required.item] + dest.required.count
         : dest.required.count;
@@ -101,74 +100,75 @@ export class ProductionNode {
     return input.count * maxMultipler;
   }
 
-  static clone(nodes: ProductionNode[]): ProductionNode[] {
+  static clone<DataType, TemplateType extends Template>(
+    nodes: ProductionNode<DataType, TemplateType>[],
+  ): ProductionNode<DataType, TemplateType>[] {
     if (nodes.length == 0) {
       return [];
     }
 
-    const seen = new Map<ProductionNode, ProductionNode>();
-    const stack: ProductionNode[] = [nodes[0]];
+    const seen = new Map<
+      ProductionNode<DataType, TemplateType>,
+      ProductionNode<DataType, TemplateType>
+    >();
+    const stack: ProductionNode<DataType, TemplateType>[] = [nodes[0]];
 
-    const newNode = new ProductionNode(
+    const newNode = new ProductionNode<DataType, TemplateType>(
       nodes[0].template,
-      nodes[0].destinations.map(d => d.required)
     );
     seen.set(nodes[0], newNode);
 
     while (stack.length) {
       const v = stack.pop();
 
-      for (let i = 0; i < v.destinations.length; i++) {
-        const old = v.destinations[i];
-        if (!old.destination) continue;
-        let neighbour = seen.get(old.destination);
-        if (!neighbour) {
-          neighbour = new ProductionNode(
-            old.destination.template,
-            old.destination.destinations.map(d => d.required)
-          );
-          stack.push(old.destination);
-          seen.set(old.destination, neighbour);
+      for (let i = 0; i < v.outputs.length; i++) {
+        const old = v.outputs[i];
+        let neighbour: ProductionNode<DataType, TemplateType>;
+        if (old.destination) {
+          neighbour = seen.get(old.destination);
+          if (!neighbour) {
+            neighbour = new ProductionNode(old.destination.template);
+            stack.push(old.destination);
+            seen.set(old.destination, neighbour);
+          }
         }
-        seen.get(v).destinations[i].destination = neighbour;
+        seen.get(v).linkTo(old.required, neighbour);
       }
 
-      for (let i = 0; i < v.sources.length; i++) {
-        const old = v.sources[i];
-        if (!old.destination) continue;
-        let neighbour = seen.get(old.destination);
+      for (let i = 0; i < v.inputs.length; i++) {
+        const old = v.inputs[i];
+        if (!old.source) continue;
+        let neighbour = seen.get(old.source);
         if (!neighbour) {
-          neighbour = new ProductionNode(
-            old.destination.template,
-            old.destination.destinations.map(d => d.required)
-          );
-          stack.push(old.destination);
-          seen.set(old.destination, neighbour);
+          neighbour = new ProductionNode(old.source.template);
+          stack.push(old.source);
+          seen.set(old.source, neighbour);
         }
-        seen.get(v).sources[i].destination = neighbour;
       }
     }
 
     return nodes.map(n => seen.get(n));
   }
 
-  *walk(): Generator<[ProductionNode, number]> {
-    const seen = new Set<ProductionNode>();
-    const unseen: [ProductionNode, number][] = [[this, 0]];
+  *walk(): Generator<[ProductionNode<DataType, TemplateType>, number]> {
+    const seen = new Set<ProductionNode<DataType, TemplateType>>();
+    const unseen: [ProductionNode<DataType, TemplateType>, number][] = [
+      [this, 0],
+    ];
     seen.add(this);
 
     while (unseen.length > 0) {
       const [node, depth] = unseen.pop();
       seen.add(node);
 
-      node.sources
-        .filter(s => s.destination && !seen.has(s.destination))
+      node.inputs
+        .filter(s => s.source && !seen.has(s.source))
         .map(s => {
-          unseen.push([s.destination, depth + 1]);
-          seen.add(s.destination);
+          unseen.push([s.source, depth + 1]);
+          seen.add(s.source);
         });
 
-      node.destinations
+      node.outputs
         .filter(s => s.destination && !seen.has(s.destination))
         .map(s => {
           unseen.push([s.destination, depth - 1]);
@@ -192,13 +192,13 @@ export class ProductionNode {
       out += "  ".repeat(depth - min);
 
       out +=
-        node.sources
+        node.inputs
           .map((i, n) => `${i.required.count} ${util.inspect(i.required.item)}`)
           .join(" + ") || "none";
 
       out += " -> ";
 
-      out += node.destinations
+      out += node.outputs
         .map(i => `${i.required.count} ${util.inspect(i.required.item)}`)
         .join(" + ");
 
@@ -208,25 +208,26 @@ export class ProductionNode {
   }
 }
 
-export class Link {
-  destination?: ProductionNode;
+export class Link<DataType, TemplateType extends Template> {
+  source?: ProductionNode<DataType, TemplateType>;
+  destination?: ProductionNode<DataType, TemplateType>;
   required: ItemCount;
 
-  constructor(required: ItemCount, destination?: ProductionNode) {
-    this.destination = destination;
+  constructor(required: ItemCount) {
     this.required = required;
   }
 }
 
-export function* solve(
+export function* solve<DataType, TemplateType extends Template>(
   producers: Template[],
-  target: ItemCount
-): Generator<ProductionNode> {
+  target: ItemCount,
+): Generator<ProductionNode<DataType, Template>> {
   const producerByInput = createProducerMap(producers);
   let solutions = producerByInput
     .get(target.item)
-    .map<ProductionNode[]>(template => {
-      const result = new ProductionNode(template, [target]);
+    .map<ProductionNode<DataType, Template>[]>(template => {
+      const result = new ProductionNode<DataType, Template>(template);
+      result.linkTo(target);
       return [result, result];
     });
 
@@ -240,7 +241,7 @@ export function* solve(
       }
       const peek = incomplete[incomplete.length - 1];
       const possibleWays = flattenInputs(
-        peek.template.inputs.map(i => producerByInput.get(i.item))
+        peek.template.inputs.map(i => producerByInput.get(i.item)),
       );
 
       if (possibleWays.length == 0) {
@@ -249,7 +250,7 @@ export function* solve(
       }
 
       const clones = possibleWays.map((_, i) =>
-        i === 0 ? incomplete : ProductionNode.clone(incomplete)
+        i === 0 ? incomplete : ProductionNode.clone(incomplete),
       );
 
       solutions.push(...clones.slice(1));
@@ -263,27 +264,21 @@ export function* solve(
           const inputTemplate = inputs[j];
 
           let producer = consumer.find(inputTemplate);
-          if (producer) {
-            producer.addDestination(
-              consumer,
-              j,
-              inputTemplate,
-              inputTemplate.outputs.map(t => ({
-                item: t.item,
-                count: consumer.requiredInputAmount(t.item)
-              }))
-            );
-          } else {
-            producer = new ProductionNode(
-              inputTemplate,
-              inputTemplate.outputs.map(t => ({
-                item: t.item,
-                count: consumer.requiredInputAmount(t.item)
-              }))
-            );
-            consumer.sources[j].destination = producer;
-            producer.destinations[0].destination = consumer;
+          if (!producer) {
+            producer = new ProductionNode<DataType, Template>(inputTemplate);
             incomplete.push(producer);
+          }
+
+          for (const output of inputTemplate.outputs) {
+            if (consumer.accepts(output.item)) {
+              producer.linkTo(
+                {
+                  item: output.item,
+                  count: consumer.requiredInputAmount(output.item),
+                },
+                consumer,
+              );
+            }
           }
         }
       }

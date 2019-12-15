@@ -17,6 +17,9 @@
     "normalize.css": "^8.0.1",
     "preact": "^10.1.0"
   },
+  "prettier": {
+    "trailingComma": "all"
+  },
   "scripts": {
     "dev": "parcel index.html",
     "import": "ts-node bin/import.ts"
