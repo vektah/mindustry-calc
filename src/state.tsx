@@ -74,7 +74,6 @@ export class State {
     );
 
     this.setActive(0);
-    // setInterval(forceLayout, 30);
   }
 
   setActive(n: number) {
@@ -91,6 +90,7 @@ export class State {
     for (let i = 0; i < 500; i++) {
       this.forceLayout();
     }
+    // setInterval(() => state.forceLayout(), 30);
   }
 
   calcForce(a: Point, b: Point, f: (dist: number) => number) {
@@ -101,7 +101,6 @@ export class State {
   }
 
   forceLayout() {
-    // setInterval(forceLayout, 100);
     const c1 = 50;
     const c2 = 100;
     const c3 = 100000;
@@ -118,10 +117,16 @@ export class State {
     }
 
     for (const block of state.blocks) {
-      if (block == state.blocks[0]) {
+      if (block === state.blocks[0]) {
         block.data.center.x = block.data.center.x + (-minX + 100) / 10;
         block.data.center.y = block.data.center.y + (-minY + 100) / 10;
         continue;
+      }
+      if (block.data.center.x < 10) {
+        block.data.center.x = 10;
+      }
+      if (block.data.center.y < 10) {
+        block.data.center.y = 10;
       }
 
       const totalCorrection = new Point(-20, 0);
@@ -147,6 +152,23 @@ export class State {
           ),
         );
       }
+
+      totalCorrection.addThis(
+        this.calcForce(
+          block.data.center,
+          new Point(0, block.data.center.y),
+          d => c3 / (d * d),
+        ),
+      );
+
+      totalCorrection.addThis(
+        this.calcForce(
+          block.data.center,
+          new Point(block.data.center.x, 0),
+          d => c3 / (d * d),
+        ),
+      );
+
       block.data.center.addThis(totalCorrection);
     }
   }
