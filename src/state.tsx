@@ -3,7 +3,9 @@ import { useEffect, useMemo, useState } from "preact/hooks";
 import { memo } from "preact/compat";
 import { FunctionalComponent, h, RefObject } from "preact";
 import GenericCrafter from "./game/GenericCrafter";
-import Blocks from "./game/Blocks";
+import { ProductionNode, solve } from "./solver/solver";
+import Items from "./game/Items";
+import producers from "./game/producers";
 import ItemStack from "./game/ItemStack";
 
 export class Point {
@@ -50,28 +52,26 @@ export class BlockState {
   }
 
   linkTo(b: BlockState) {
-    const outputs = this.recipe.outputRate({ machines: this.count });
+    const output = this.recipe.outputRate({ machines: this.count });
     const inputs = b.recipe.inputRate({ machines: b.count });
 
-    outputs.forEach(output =>
-      inputs.forEach(input => {
-        if (output.item.name != input.item.name) {
-          return;
-        }
+    inputs.forEach(input => {
+      if (output[0].item.name != input.item.name) {
+        return;
+      }
 
-        this.outputs.push({
-          source: this,
-          dest: b,
-          item: output
-        });
+      this.outputs.push({
+        source: this,
+        dest: b,
+        item: output[0]
+      });
 
-        b.inputs.push({
-          source: this,
-          dest: b,
-          item: output
-        });
-      })
-    );
+      b.inputs.push({
+        source: this,
+        dest: b,
+        item: output[0]
+      });
+    });
   }
 }
 
@@ -121,13 +121,16 @@ export function view<T>(Comp: FunctionalComponent<T>): FunctionalComponent<T> {
 
 export const state = observable(new State());
 
-const silicon = new BlockState(50, 100, Blocks.siliconSmelter);
-const surgeSmelter = new BlockState(450, 100, Blocks.surgeSmelter);
+const result = Array.from(solve(producers, new ItemStack(Items.silicon, 10)));
 
-state.blocks.push(silicon, surgeSmelter);
+const nodes = new Map<ProductionNode, BlockState>();
 
-silicon.linkTo(surgeSmelter);
-
-setTimeout(() => {}, 1000);
-
-setTimeout(() => {}, 2000);
+for (const [node, depth] of result[0].walk()) {
+  const block = new BlockState(50, 50, node.template as GenericCrafter);
+  nodes.set(node, block);
+  for (const outputs of node.destinations) {
+    if (!node.destinations || !nodes.get(outputs.destination)) continue;
+    block.linkTo(nodes.get(outputs.destination));
+  }
+  state.blocks.push(block);
+}

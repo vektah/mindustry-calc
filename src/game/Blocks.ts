@@ -3,6 +3,7 @@ import Items from "./Items";
 import GenericCrafter from "./GenericCrafter";
 import GenericSmelter from "./GenericSmelter";
 import LiquidConverter from "./GenericSmelter";
+import Drill from "./Drill";
 import Separator from "./GenericSmelter";
 import ItemStack from "./ItemStack";
 import Liquids from "./Liquids";
@@ -319,5 +320,84 @@ export default {
     consumesLiquid: [Liquids.oil, 0.09],
 
     consumesPower: [0.5]
+  }),
+  mechanicalDrill: new Drill("mechanical-drill", {
+    requirements: ["production", ItemStack.with(Items.copper, 12), true],
+
+    tier: 2,
+    drillTime: 600,
+    size: 2,
+    drawMineItem: true,
+
+    boostConsumesLiquid: [Liquids.water, 0.05]
+  }),
+  pneumaticDrill: new Drill("pneumatic-drill", {
+    requirements: [
+      "production",
+      ItemStack.with(Items.copper, 18, Items.graphite, 10)
+    ],
+
+    tier: 3,
+    drillTime: 400,
+    size: 2,
+    drawMineItem: true,
+
+    boostConsumesLiquid: [Liquids.water, 0.06]
+  }),
+  laserDrill: new Drill("laser-drill", {
+    requirements: [
+      "production",
+      ItemStack.with(
+        Items.copper,
+        35,
+        Items.graphite,
+        30,
+        Items.silicon,
+        30,
+        Items.titanium,
+        20
+      )
+    ],
+
+    drillTime: 280,
+    size: 3,
+    hasPower: true,
+    tier: 4,
+    updateEffect: "pulverizeMedium",
+    drillEffect: "mineBig",
+
+    consumesPower: [1.1],
+
+    boostConsumesLiquid: [Liquids.water, 0.08]
+  }),
+  blastDrill: new Drill("blast-drill", {
+    requirements: [
+      "production",
+      ItemStack.with(
+        Items.copper,
+        65,
+        Items.silicon,
+        60,
+        Items.titanium,
+        50,
+        Items.thorium,
+        75
+      )
+    ],
+
+    drillTime: 280,
+    size: 4,
+    drawRim: true,
+    hasPower: true,
+    tier: 5,
+    updateEffect: "pulverizeRed",
+    updateEffectChance: 0.03,
+    drillEffect: "mineHuge",
+    rotateSpeed: 6,
+    warmupSpeed: 0.01,
+
+    consumesPower: [3],
+
+    boostConsumesLiquid: [Liquids.water, 0.1]
   })
 };

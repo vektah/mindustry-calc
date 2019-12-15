@@ -23,6 +23,7 @@ async function importBlocks() {
   out += 'import GenericCrafter from "./GenericCrafter";\n';
   out += 'import GenericSmelter from "./GenericSmelter";\n';
   out += 'import LiquidConverter from "./GenericSmelter";\n';
+  out += 'import Drill from "./Drill";\n';
   out += 'import Separator from "./GenericSmelter";\n';
   out += 'import ItemStack from "./ItemStack";\n';
   out += 'import Liquids from "./Liquids";\n';
@@ -31,7 +32,7 @@ async function importBlocks() {
   out += "export default {\n";
 
   for (const item of response.body.matchAll(
-    / (\w+) = new (GenericCrafter|GenericSmelter|LiquidConverter|Separator)\((.*?)\){{((.|\n)*?)}}/g
+    / (\w+) = new (GenericCrafter|GenericSmelter|LiquidConverter|Separator|Drill)\((.*?)\){{((.|\n)*?)}}/g
   )) {
     const body = jsify(item[4]);
 
@@ -49,6 +50,10 @@ function jsify(input: string): string {
     .replace(/^\s+int.*;/gm, "")
     .replace(/^\s*for\((.|\n)*?}/gm, "")
     .replace(
+      /^\s*(.*?)\.boost\(\)/gm,
+      (_, a) => "boost" + a[0].toUpperCase() + a.slice(1)
+    )
+    .replace(
       /(\w+ = ){2,}(.*);/,
       (s, _, v) =>
         s
@@ -56,13 +61,10 @@ function jsify(input: string): string {
           .slice(0, -1)
           .join(`: ${v},`) + `: ${v},`
     )
-    .replace("hasPower = hasLiquids = true", "hasPower: true, hasLiquids: true")
-    .replace("hasLiquids = hasPower = true", "hasPower: true, hasLiquids: true")
-    .replace("hasItems = hasPower = true", "hasItems: true, hasPower: true")
     .replace(
       /^\s*([\w.]+)\((.*)\);/gm,
       (_, name, args) =>
-        `\n${name.replace(/\.(.)/, (_, next) =>
+        `\n${name.replace(/\.(.)/, (_: any, next: string) =>
           next.toUpperCase()
         )} = [${args}],\n`
     )

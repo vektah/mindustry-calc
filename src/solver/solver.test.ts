@@ -37,23 +37,23 @@ test("solve", () => {
 
   const results = solve(allRecipes, { item: "bread", count: 2 });
   expect(util.inspect(Array.from(results))).toEqual(`[
-  1 water + 1 flour + 1 sugar -> 2 bread
-    none -> 1 sugar
-    none -> 1 flour
-    none -> 1 water
+  1 'water' + 1 'flour' + 1 'sugar' -> 2 'bread'
+    none -> 1 'sugar'
+    none -> 1 'flour'
+    none -> 1 'water'
   ,
-  1 water + 1 flour + 1 sugar -> 2 bread
-    none -> 1 sugar
-    0.2 water -> 1 flour
-    none -> 1 water + 0.2 water
+  1 'water' + 1 'flour' + 1 'sugar' -> 2 'bread'
+    none -> 1 'sugar'
+    0.2 'water' -> 1 'flour'
+    none -> 1 'water' + 0.2 'water'
   ,
-  4 water + 6 flour -> 2 bread
-    none -> 6 flour
-    none -> 4 water
+  4 'water' + 6 'flour' -> 2 'bread'
+    none -> 6 'flour'
+    none -> 4 'water'
   ,
-  4 water + 6 flour -> 2 bread
-    1.2 water -> 6 flour
-    none -> 4 water + 1.2 water
+  4 'water' + 6 'flour' -> 2 'bread'
+    1.2 'water' -> 6 'flour'
+    none -> 4 'water' + 1.2 'water'
   
 ]`);
 });
@@ -61,7 +61,9 @@ test("solve", () => {
 test("solve infinite loop", () => {
   const results = solve(allRecipes, { item: "slime", count: 2 });
 
-  console.log(Array.from(results));
+  expect(util.inspect(Array.from(results)[0])).toEqual(
+    "2 'slime' -> 2 'slime' + 2 'slime'\n"
+  );
 });
 
 describe("ProductionNode", () => {

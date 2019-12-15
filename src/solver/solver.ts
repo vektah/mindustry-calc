@@ -6,7 +6,7 @@ export interface Template {
 }
 
 export interface ItemCount {
-  item: string;
+  item: any;
   count: number;
 }
 
@@ -14,7 +14,6 @@ export class ProductionNode {
   template: Template;
   sources?: Link[];
   destinations?: Link[];
-  recursionDepth: number = 0;
 
   constructor(template: Template, targets: ItemCount[]) {
     this.template = template;
@@ -194,13 +193,13 @@ export class ProductionNode {
 
       out +=
         node.sources
-          .map((i, n) => `${i.required.count} ${i.required.item}`)
+          .map((i, n) => `${i.required.count} ${util.inspect(i.required.item)}`)
           .join(" + ") || "none";
 
       out += " -> ";
 
       out += node.destinations
-        .map(i => `${i.required.count} ${i.required.item}`)
+        .map(i => `${i.required.count} ${util.inspect(i.required.item)}`)
         .join(" + ");
 
       out += "\n";
@@ -224,26 +223,28 @@ export function* solve(
   target: ItemCount
 ): Generator<ProductionNode> {
   const producerByInput = createProducerMap(producers);
-  let solutions = producerByInput[target.item].map<ProductionNode[]>(
-    template => {
-      return [new ProductionNode(template, [target])];
-    }
-  );
+  let solutions = producerByInput
+    .get(target.item)
+    .map<ProductionNode[]>(template => {
+      const result = new ProductionNode(template, [target]);
+      return [result, result];
+    });
 
   while (solutions.length > 0) {
     const incomplete = solutions.pop();
 
     while (incomplete.length > 0) {
+      if (incomplete.length === 1) {
+        yield incomplete[0];
+        break;
+      }
       const peek = incomplete[incomplete.length - 1];
       const possibleWays = flattenInputs(
-        peek.template.inputs.map(i => producerByInput[i.item])
+        peek.template.inputs.map(i => producerByInput.get(i.item))
       );
 
       if (possibleWays.length == 0) {
-        const consumer = incomplete.pop();
-        if (incomplete.length === 0) {
-          yield consumer.findUp(target.item);
-        }
+        incomplete.pop();
         continue;
       }
 
@@ -285,10 +286,6 @@ export function* solve(
             incomplete.push(producer);
           }
         }
-
-        if (incomplete.length === 0) {
-          yield consumer.findUp(target.item);
-        }
       }
     }
   }
@@ -327,18 +324,18 @@ export function flattenInputs(inputs: Template[][]): Template[][] {
   return results;
 }
 
-function createProducerMap(
-  producers: Template[]
-): { [item: string]: Template[] } {
-  let producerByInput: { [item: string]: Template[] } = {};
+function createProducerMap(producers: Template[]) {
+  const producerByInput = new Map<any, Template[]>();
 
   for (const block of producers) {
     for (const out of block.outputs) {
-      if (!producerByInput[out.item]) {
-        producerByInput[out.item] = [];
+      let producers = producerByInput.get(out.item);
+      if (!producers) {
+        producers = [];
+        producerByInput.set(out.item, producers);
       }
 
-      producerByInput[out.item].push(block);
+      producers.push(block);
     }
   }
   return producerByInput;

@@ -5,24 +5,24 @@ import Liquid from "./Liquid";
 
 export default class GenericCrafter {
   name: string;
-  consumes: ItemStack[] = [];
+  inputs: ItemStack[] = [];
   outputs: ItemStack[] = [];
   craftTime: number;
 
   constructor(name: string, opts: CrafterOptions) {
     this.name = name;
 
-    if (opts.consumesItems) this.consumes.push(...opts.consumesItems);
-    if (opts.consumesItem) this.consumes.push(makeStack(opts.consumesItem));
+    if (opts.consumesItems) this.inputs.push(...opts.consumesItems);
+    if (opts.consumesItem) this.inputs.push(makeStack(opts.consumesItem));
 
-    if (opts.outputItems) this.outputs.push(...opts.outputsItems);
-    if (opts.outputItem) this.outputs.push(makeStack(opts.outputItem));
+    if (opts.outputItems) this.outputs = opts.outputsItems;
+    if (opts.outputItem) this.outputs = [makeStack(opts.outputItem)];
 
-    if (opts.consumesLiquids) this.consumes.push(...opts.consumesLiquids);
-    if (opts.consumesLiquid) this.consumes.push(makeStack(opts.consumesLiquid));
+    if (opts.consumesLiquids) this.inputs.push(...opts.consumesLiquids);
+    if (opts.consumesLiquid) this.inputs.push(makeStack(opts.consumesLiquid));
 
-    if (opts.outputLiquids) this.outputs.push(...opts.outputsLiquids);
-    if (opts.outputLiquid) this.outputs.push(makeStack(opts.outputLiquid));
+    if (opts.outputLiquids) this.outputs = opts.outputsLiquids;
+    if (opts.outputLiquid) this.outputs = [makeStack(opts.outputLiquid)];
 
     this.craftTime = opts.craftTime / 60 || 80 / 60;
   }
@@ -32,7 +32,7 @@ export default class GenericCrafter {
   }
 
   inputRate(opts: CraftingCalcOpts = {}): ItemStack[] {
-    return this.consumes.map(this.calcrate(opts));
+    return this.inputs.map(this.calcrate(opts));
   }
 
   private calcrate({
