@@ -29,6 +29,35 @@ export class ProductionNode<DataType, TemplateType extends Template> {
     });
   }
 
+  calcBaseInputs() {
+    const inputs = new Map<any, ItemCount>();
+
+    for (const [node, depth] of this.walk()) {
+      for (const input of node.inputs) {
+        if (input.source) continue;
+
+        const existing = inputs.get(input.required.item);
+        if (existing) {
+          existing.count += input.required.count;
+        } else {
+          inputs.set(input.required.item, input.required);
+        }
+      }
+      if (node.inputs.length == 0) {
+        for (const output of node.outputs) {
+          const existing = inputs.get(output.required.item);
+          if (existing) {
+            existing.count += output.required.count;
+          } else {
+            inputs.set(output.required.item, output.required);
+          }
+        }
+      }
+    }
+
+    return Array.from(inputs.values());
+  }
+
   linkTo(
     target: ItemCount,
     destination?: ProductionNode<DataType, TemplateType>,

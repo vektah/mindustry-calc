@@ -4,22 +4,26 @@ import { ProductionNode } from "./solver/solver";
 import { view, ViewData } from "./state";
 import GenericCrafter from "./game/GenericCrafter";
 
-const images = require("../public/mindustry/sprites/blocks/production/*.png");
+const production = require("../public/mindustry/sprites/blocks/production/*.png");
+const drills = require("../public/mindustry/sprites/blocks/drills/*.png");
 
 function Label({ children }: { children?: ComponentChildren }) {
   return <div class="block-label">{children}</div>;
 }
 
-console.log(images);
-
 function Block({ block }: { block: ProductionNode<ViewData, GenericCrafter> }) {
+  const imageName = block.template.name;
+  let img = imageName.startsWith("mine-")
+    ? drills["blast-drill"]
+    : production[imageName];
+
   return (
     <Draggable
       className="block"
       pos={block.data.center}
       ref={block.data.ref}
       style={{
-        backgroundImage: `url(${images[block.template.name]})`,
+        backgroundImage: `url(${img})`,
       }}
     >
       <Label>{block.template.name}</Label>
