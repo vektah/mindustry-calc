@@ -15,16 +15,13 @@ import { writeFileSync } from "fs";
 
 async function importBlocks() {
   const response = await got(
-    "https://raw.githubusercontent.com/Anuken/Mindustry/master/core/src/io/anuke/mindustry/content/Blocks.java"
+    "https://raw.githubusercontent.com/Anuken/Mindustry/master/core/src/io/anuke/mindustry/content/Blocks.java",
   );
 
   let out = 'import {Item} from "./item";\n';
   out += 'import Items from "./Items";\n';
-  out += 'import GenericCrafter from "./GenericCrafter";\n';
-  out += 'import GenericSmelter from "./GenericSmelter";\n';
-  out += 'import LiquidConverter from "./GenericSmelter";\n';
-  out += 'import Drill from "./Drill";\n';
-  out += 'import Separator from "./GenericSmelter";\n';
+  out +=
+    'import GenericCrafter, { GenericSmelter, LiquidConverter, Drill, Separator, SolidPump, Cultivator, Fracker } from "./GenericCrafter";\n';
   out += 'import ItemStack from "./ItemStack";\n';
   out += 'import Liquids from "./Liquids";\n';
   out += 'import LiquidStack from "./LiquidStack";\n';
@@ -32,7 +29,7 @@ async function importBlocks() {
   out += "export default {\n";
 
   for (const item of response.body.matchAll(
-    / (\w+) = new (GenericCrafter|GenericSmelter|LiquidConverter|Separator|Drill)\((.*?)\){{((.|\n)*?)}}/g
+    / (\w+) = new (GenericCrafter|GenericSmelter|LiquidConverter|Separator|Drill|SolidPump|Cultivator|Fracker)\((.*?)\){{((.|\n)*?)}}/g,
   )) {
     const body = jsify(item[4]);
 
@@ -51,7 +48,7 @@ function jsify(input: string): string {
     .replace(/^\s*for\((.|\n)*?}/gm, "")
     .replace(
       /^\s*(.*?)\.boost\(\)/gm,
-      (_, a) => "boost" + a[0].toUpperCase() + a.slice(1)
+      (_, a) => "boost" + a[0].toUpperCase() + a.slice(1),
     )
     .replace(
       /(\w+ = ){2,}(.*);/,
@@ -59,20 +56,20 @@ function jsify(input: string): string {
         s
           .split(" = ")
           .slice(0, -1)
-          .join(`: ${v},`) + `: ${v},`
+          .join(`: ${v},`) + `: ${v},`,
     )
     .replace(
       /^\s*([\w.]+)\((.*)\);/gm,
       (_, name, args) =>
         `\n${name.replace(/\.(.)/, (_: any, next: string) =>
-          next.toUpperCase()
-        )} = [${args}],\n`
+          next.toUpperCase(),
+        )} = [${args}],\n`,
     )
     .replace(/ =/g, ":")
     .replace(/Color.valueOf\("(.*?)"\)(\.a\(.*\))?/g, (s, a) => `"#${a}"`)
     .replace(
-      /\b(ItemType|Category|Fx|StatusEffects|Color)\.(\w*)/g,
-      (s, c, value) => `"${value}"`
+      /\b(ItemType|Category|Fx|StatusEffects|Color|Attribute)\.(\w*)/g,
+      (s, c, value) => `"${value}"`,
     )
     .replace(/;$/gm, ",")
     .replace(/([\d.]+)f/g, (s, a) => a);
@@ -80,13 +77,13 @@ function jsify(input: string): string {
 
 async function importItems() {
   const response = await got(
-    "https://raw.githubusercontent.com/Anuken/Mindustry/master/core/src/io/anuke/mindustry/content/Items.java"
+    "https://raw.githubusercontent.com/Anuken/Mindustry/master/core/src/io/anuke/mindustry/content/Items.java",
   );
 
   let out = 'import {Item} from "./item";\n\n';
   out += "export default {\n";
   const items = response.body.matchAll(
-    / (\w+) = new Item\((.*?),\s*Color.valueOf\("(.*?")\)\){{((.|\n)*?)}};/g
+    / (\w+) = new Item\((.*?),\s*Color.valueOf\("(.*?")\)\){{((.|\n)*?)}};/g,
   );
 
   for (const item of items) {
@@ -101,13 +98,13 @@ async function importItems() {
 
 async function importLiquids() {
   const response = await got(
-    "https://raw.githubusercontent.com/Anuken/Mindustry/master/core/src/io/anuke/mindustry/content/Liquids.java"
+    "https://raw.githubusercontent.com/Anuken/Mindustry/master/core/src/io/anuke/mindustry/content/Liquids.java",
   );
 
   let out = 'import Liquid from "./Liquid";\n\n';
   out += "export default {\n";
   const items = response.body.matchAll(
-    / (\w+) = new Liquid\((.*?),\s*Color.valueOf\("(.*?")\)\){{((.|\n)*?)}};/g
+    / (\w+) = new Liquid\((.*?),\s*Color.valueOf\("(.*?")\)\){{((.|\n)*?)}};/g,
   );
 
   for (const item of items) {

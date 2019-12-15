@@ -7,6 +7,7 @@ import Items from "./game/Items";
 import producers from "./game/producers";
 import ItemStack from "./game/ItemStack";
 import GenericCrafter from "./game/GenericCrafter";
+import Blocks from "./game/Blocks";
 
 export class Point {
   x: number;
@@ -87,7 +88,7 @@ export class State {
       state.blocks.push(node);
     }
 
-    for (let i = 0; i < 200; i++) {
+    for (let i = 0; i < 500; i++) {
       this.forceLayout();
     }
   }
@@ -193,3 +194,6 @@ export function view<T>(Comp: FunctionalComponent<T>): FunctionalComponent<T> {
 
 export const state = observable(new State());
 state.solve();
+
+window.Blocks = Blocks;
+window.state = state;

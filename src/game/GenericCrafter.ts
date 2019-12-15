@@ -38,15 +38,33 @@ export default class GenericCrafter {
   private calcrate({
     efficiency = 1,
     machines = 1,
-    overdrive = "none"
+    overdrive = "none",
   }: CraftingCalcOpts = {}) {
     return (i: ItemStack) =>
       new ItemStack(
         i.item,
-        (i.count / this.craftTime) * machines * odRatio[overdrive] * efficiency
+        (i.count / this.craftTime) * machines * odRatio[overdrive] * efficiency,
       );
   }
 }
+
+export class GenericSmelter extends GenericCrafter {}
+export class Drill extends GenericCrafter {}
+export class LiquidConverter extends GenericCrafter {}
+export class Separator extends GenericCrafter {}
+export class SolidPump extends GenericCrafter {
+  constructor(
+    name: string,
+    opts: CrafterOptions & { pumpAmount: number; result: Liquid },
+  ) {
+    super(name, {
+      outputLiquid: new LiquidStack(opts.result, opts.pumpAmount),
+      ...opts,
+    });
+  }
+}
+export class Cultivator extends GenericCrafter {}
+export class Fracker extends GenericCrafter {}
 
 interface CraftingCalcOpts {
   efficiency?: number;
@@ -57,7 +75,7 @@ interface CraftingCalcOpts {
 const odRatio = {
   none: 1,
   boost: 1.5,
-  phase: 2.25
+  phase: 2.25,
 };
 
 function makeStack(i: itemLike): ItemStack {
