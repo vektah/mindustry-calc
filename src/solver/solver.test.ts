@@ -23,6 +23,10 @@ const recipes: { [name: string]: Template } = {
       { item: "sugar", count: 1 }
     ],
     outputs: [{ item: "bread", count: 2 }]
+  },
+  positiveFeedbackLoop: {
+    inputs: [{ item: "slime", count: 1 }],
+    outputs: [{ item: "slime", count: 2 }]
   }
 };
 
@@ -41,8 +45,7 @@ test("solve", () => {
   1 water + 1 flour + 1 sugar -> 2 bread
     none -> 1 sugar
     0.2 water -> 1 flour
-      none -> 0.2 water
-    none -> 1 water
+    none -> 1 water + 0.2 water
   ,
   4 water + 6 flour -> 2 bread
     none -> 6 flour
@@ -50,10 +53,15 @@ test("solve", () => {
   ,
   4 water + 6 flour -> 2 bread
     1.2 water -> 6 flour
-      none -> 1.2 water
-    none -> 4 water
+    none -> 4 water + 1.2 water
   
 ]`);
+});
+
+test("solve infinite loop", () => {
+  const results = solve(allRecipes, { item: "slime", count: 2 });
+
+  console.log(Array.from(results));
 });
 
 describe("ProductionNode", () => {

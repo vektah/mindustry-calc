@@ -14,6 +14,7 @@ export class ProductionNode {
   template: Template;
   sources?: Link[];
   destinations?: Link[];
+  recursionDepth: number = 0;
 
   constructor(template: Template, targets: ItemCount[]) {
     this.template = template;
@@ -24,6 +25,37 @@ export class ProductionNode {
         count: this.requiredInputAmount(i.item)
       });
     });
+  }
+
+  addDestination(
+    consumer: ProductionNode,
+    consumerIndex: number,
+    template: Template,
+    targets: ItemCount[]
+  ) {
+    this.destinations.push(...targets.map(t => new Link(t, consumer)));
+
+    consumer.sources[consumerIndex].destination = this;
+
+    this.updateSourceRequirements();
+  }
+
+  updateSourceRequirements(maxDepth = 200) {
+    if (maxDepth < 0) {
+      return;
+    }
+    for (const s of this.sources) {
+      const amount = this.requiredInputAmount(s.required.item);
+      s.required.count = amount;
+      if (s.destination) {
+        for (const d of s.destination.destinations) {
+          if (d.destination === this && d.required.item == s.required.item) {
+            d.required.count = amount;
+          }
+        }
+        s.destination.updateSourceRequirements(maxDepth - 1);
+      }
+    }
   }
 
   findUp(name: string): ProductionNode | undefined {
@@ -40,12 +72,10 @@ export class ProductionNode {
     }
   }
 
-  findConsumed(template: Template): string {
-    for (const consumed of this.template.inputs) {
-      for (const produced of template.inputs) {
-        if (consumed.item == produced.item) {
-          return consumed.item;
-        }
+  find(template: Template): ProductionNode {
+    for (const [node, depth] of this.walk()) {
+      if (node.template === template) {
+        return node;
       }
     }
   }
@@ -230,17 +260,30 @@ export function* solve(
 
         for (let j = 0; j < inputs.length; j++) {
           const inputTemplate = inputs[j];
-          const producer = new ProductionNode(
-            inputTemplate,
-            inputTemplate.outputs.map(t => ({
-              item: t.item,
-              count: consumer.requiredInputAmount(t.item)
-            }))
-          );
 
-          consumer.sources[j].destination = producer;
-          producer.destinations[0].destination = consumer;
-          incomplete.push(producer);
+          let producer = consumer.find(inputTemplate);
+          if (producer) {
+            producer.addDestination(
+              consumer,
+              j,
+              inputTemplate,
+              inputTemplate.outputs.map(t => ({
+                item: t.item,
+                count: consumer.requiredInputAmount(t.item)
+              }))
+            );
+          } else {
+            producer = new ProductionNode(
+              inputTemplate,
+              inputTemplate.outputs.map(t => ({
+                item: t.item,
+                count: consumer.requiredInputAmount(t.item)
+              }))
+            );
+            consumer.sources[j].destination = producer;
+            producer.destinations[0].destination = consumer;
+            incomplete.push(producer);
+          }
         }
 
         if (incomplete.length === 0) {
