@@ -82,12 +82,20 @@ export function useAppState() {
     const results = doSolve();
 
     for (const result of results) {
-      for (const [node] of result.walk()) {
+      let maxDepth = 0;
+      for (const [node, depth] of result.walk()) {
+        if (depth > maxDepth) {
+          maxDepth = depth;
+        }
+      }
+
+      // lets try and lay things out so that force based graph algorithm can quickly converge
+      const depthOffset = new Map<number, number>();
+      for (const [node, depth] of result.walk()) {
+        const y = depthOffset.get(depth) || 0;
+        depthOffset.set(depth, y + 1);
         node.data = {
-          center: new Point(
-            Math.random() * 500 + 100,
-            Math.random() * 500 + 100,
-          ),
+          center: new Point((maxDepth - depth) * 150 + 100, y * 150 + 100),
           count: 1,
           ref: { current: undefined },
           redraw() {
@@ -96,7 +104,7 @@ export function useAppState() {
           },
         };
       }
-      for (let i = 0; i < 200; i++) {
+      for (let i = 0; i < 100; i++) {
         forceLayout(result);
       }
     }
