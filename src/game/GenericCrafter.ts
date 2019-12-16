@@ -49,7 +49,6 @@ export default class GenericCrafter {
 }
 
 export class GenericSmelter extends GenericCrafter {}
-export class Drill extends GenericCrafter {}
 export class LiquidConverter extends GenericCrafter {}
 export class Separator extends GenericCrafter {}
 export class SolidPump extends GenericCrafter {
@@ -64,7 +63,10 @@ export class SolidPump extends GenericCrafter {
   }
 }
 export class Cultivator extends GenericCrafter {}
-export class Fracker extends GenericCrafter {}
+export class Fracker extends SolidPump {}
+
+export class Pump extends GenericCrafter {}
+export class Drill extends GenericCrafter {}
 
 interface CraftingCalcOpts {
   efficiency?: number;

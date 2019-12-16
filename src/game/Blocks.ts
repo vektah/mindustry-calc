@@ -8,6 +8,7 @@ import GenericCrafter, {
   SolidPump,
   Cultivator,
   Fracker,
+  Pump,
 } from "./GenericCrafter";
 import ItemStack from "./ItemStack";
 import Liquids from "./Liquids";
@@ -325,6 +326,62 @@ export default {
 
     consumesPower: [0.5],
   }),
+  mechanicalPump: new Pump("mechanical-pump", {
+    requirements: [
+      "liquid",
+      ItemStack.with(Items.copper, 15, Items.metaglass, 10),
+    ],
+
+    pumpAmount: 0.1,
+  }),
+  rotaryPump: new Pump("rotary-pump", {
+    requirements: [
+      "liquid",
+      ItemStack.with(
+        Items.copper,
+        70,
+        Items.metaglass,
+        50,
+        Items.silicon,
+        20,
+        Items.titanium,
+        35,
+      ),
+    ],
+
+    pumpAmount: 0.8,
+
+    consumesPower: [0.15],
+
+    liquidCapacity: 30,
+    hasPower: true,
+    size: 2,
+  }),
+  thermalPump: new Pump("thermal-pump", {
+    requirements: [
+      "liquid",
+      ItemStack.with(
+        Items.copper,
+        80,
+        Items.metaglass,
+        70,
+        Items.silicon,
+        30,
+        Items.titanium,
+        40,
+        Items.thorium,
+        35,
+      ),
+    ],
+
+    pumpAmount: 1.5,
+
+    consumesPower: [0.3],
+
+    liquidCapacity: 40,
+    hasPower: true,
+    size: 3,
+  }),
   mechanicalDrill: new Drill("mechanical-drill", {
     requirements: ["production", ItemStack.with(Items.copper, 12), true],
 
@@ -455,6 +512,7 @@ export default {
 
     result: Liquids.oil,
     updateEffect: "pulverize",
+    liquidCapacity: 50,
     updateEffectChance: 0.05,
     pumpAmount: 0.25,
     size: 3,

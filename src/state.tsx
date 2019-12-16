@@ -99,7 +99,6 @@ export function useAppState() {
           count: 1,
           ref: { current: undefined },
           redraw() {
-            console.log(node.data.center);
             trigger(Math.random());
           },
         };

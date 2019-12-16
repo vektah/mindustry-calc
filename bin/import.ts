@@ -21,7 +21,7 @@ async function importBlocks() {
   let out = 'import {Item} from "./item";\n';
   out += 'import Items from "./Items";\n';
   out +=
-    'import GenericCrafter, { GenericSmelter, LiquidConverter, Drill, Separator, SolidPump, Cultivator, Fracker } from "./GenericCrafter";\n';
+    'import GenericCrafter, { GenericSmelter, LiquidConverter, Drill, Separator, SolidPump, Cultivator, Fracker, Pump } from "./GenericCrafter";\n';
   out += 'import ItemStack from "./ItemStack";\n';
   out += 'import Liquids from "./Liquids";\n';
   out += 'import LiquidStack from "./LiquidStack";\n';
@@ -29,7 +29,7 @@ async function importBlocks() {
   out += "export default {\n";
 
   for (const item of response.body.matchAll(
-    / (\w+) = new (GenericCrafter|GenericSmelter|LiquidConverter|Separator|Drill|SolidPump|Cultivator|Fracker)\((.*?)\){{((.|\n)*?)}}/g,
+    / (\w+) = new (GenericCrafter|GenericSmelter|LiquidConverter|Separator|Drill|SolidPump|Cultivator|Fracker|Pump)\((.*?)\){{((.|\n)*?)}}/g,
   )) {
     const body = jsify(item[4]);
 

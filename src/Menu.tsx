@@ -59,7 +59,6 @@ export default function Menu({ state }: { state: AppState }) {
               state.setActive(index);
             }}
           >
-            <h3>{s.outputs[0].required.item.name}</h3>
             {s.calcBaseInputs().map(i => (
               <div>
                 {i.count.toFixed(2)} {i.item.name}
