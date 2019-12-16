@@ -1,7 +1,7 @@
 import { ComponentChildren, h } from "preact";
-import Draggable from "./useDraggable";
+import Draggable from "./Draggable";
 import { ProductionNode } from "./solver/solver";
-import { view, ViewData } from "./state";
+import { ViewData } from "./state";
 import GenericCrafter from "./game/GenericCrafter";
 
 const production = require("../public/mindustry/sprites/blocks/production/*.png");
@@ -11,7 +11,11 @@ function Label({ children }: { children?: ComponentChildren }) {
   return <div class="block-label">{children}</div>;
 }
 
-function Block({ block }: { block: ProductionNode<ViewData, GenericCrafter> }) {
+export default function Block({
+  block,
+}: {
+  block: ProductionNode<ViewData, GenericCrafter>;
+}) {
   const imageName = block.template.name;
   let img = imageName.startsWith("mine-")
     ? drills["blast-drill"]
@@ -21,6 +25,12 @@ function Block({ block }: { block: ProductionNode<ViewData, GenericCrafter> }) {
     <Draggable
       className="block"
       pos={block.data.center}
+      setPos={(x, y) => {
+        console.log("aa");
+        block.data.center.x = x;
+        block.data.center.y = y;
+        block.data.redraw();
+      }}
       ref={block.data.ref}
       style={{
         backgroundImage: `url(${img})`,
@@ -30,4 +40,3 @@ function Block({ block }: { block: ProductionNode<ViewData, GenericCrafter> }) {
     </Draggable>
   );
 }
-export default view(Block);

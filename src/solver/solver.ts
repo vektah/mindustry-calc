@@ -40,7 +40,7 @@ export class ProductionNode<DataType, TemplateType extends Template> {
         if (existing) {
           existing.count += input.required.count;
         } else {
-          inputs.set(input.required.item, input.required);
+          inputs.set(input.required.item, { ...input.required });
         }
       }
       if (node.inputs.length == 0) {
@@ -49,7 +49,7 @@ export class ProductionNode<DataType, TemplateType extends Template> {
           if (existing) {
             existing.count += output.required.count;
           } else {
-            inputs.set(output.required.item, output.required);
+            inputs.set(output.required.item, { ...output.required });
           }
         }
       }
@@ -251,6 +251,9 @@ export function* solve<DataType, TemplateType extends Template>(
   producers: TemplateType[],
   target: ItemCount,
 ): Generator<ProductionNode<DataType, TemplateType>> {
+  if (!target || !target.item) {
+    throw new Error("target must be defined");
+  }
   const producerByInput = createProducerMap(producers);
   let solutions = producerByInput
     .get(target.item)

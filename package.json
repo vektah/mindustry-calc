@@ -13,7 +13,6 @@
     "typescript": "^3.7.3"
   },
   "dependencies": {
-    "@nx-js/observer-util": "^4.2.2",
     "normalize.css": "^8.0.1",
     "preact": "^10.1.0"
   },

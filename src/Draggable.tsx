@@ -1,16 +1,18 @@
 import { useEffect, useRef } from "preact/hooks";
 import { h, ComponentChildren } from "preact";
 import { JSXInternal } from "preact/src/jsx";
-import { Point, view } from "./state";
+import { Point } from "./state";
 
-function Draggable({
+export default function Draggable({
   children,
   style,
   pos,
+  setPos,
   ...props
 }: JSXInternal.HTMLAttributes<HTMLDivElement> & {
   children?: ComponentChildren;
   pos: Point;
+  setPos: (x: number, y: number) => void;
 }) {
   const mouseMove = useRef(e => {});
 
@@ -33,8 +35,7 @@ function Draggable({
 
         mouseMove.current = e => {
           e.preventDefault();
-          pos.x = e.clientX - startX;
-          pos.y = e.clientY - startY;
+          setPos(e.clientX - startX, e.clientY - startY);
         };
 
         mouseUp.current = e => {
@@ -53,5 +54,3 @@ function Draggable({
     </div>
   );
 }
-
-export default view(Draggable);

@@ -46,6 +46,12 @@ body {
     h3 {
         margin: 5px 0;
     }
+
+    box-shadow: 0 2px 1px rgba(0,0,0,0.09),
+    0 4px 2px rgba(0,0,0,0.09),
+    0 8px 4px rgba(0,0,0,0.09),
+    0 16px 8px rgba(0,0,0,0.09),
+    0 32px 16px rgba(0,0,0,0.09);
 }
 
 .menu-item {
@@ -53,6 +59,8 @@ body {
     margin: 5px;
     color: #1e2022;
     cursor: pointer;
+    border-radius: 3px;
+    padding: 0px 5px;
 }
 
 .menu-item:hover {
@@ -73,6 +81,58 @@ body {
     box-sizing: border-box;
     text-align: center;
     //z-index: 1;
+}
+
+.output-selector {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.output-selector__item {
+    background-color: $lighter;
+    margin: 5px;
+    width: 24px;
+    height: 24px;
+    border-radius: 3px;
+}
+
+.output-selector__count {
+    height: 24px;
+    background-color: $lighter;
+    border: none;
+    margin: 5px;
+    flex-grow: 1;
+}
+
+.output-selector__menu {
+    position: absolute;
+    top: 30px;
+    left: 0px;
+    background-color: $lighter;
+    margin: 5px;
+    padding: 1px;
+    border-radius: 3px;
+
+    box-shadow: 0 2px 1px rgba(0,0,0,0.09),
+    0 4px 2px rgba(0,0,0,0.09),
+    0 8px 4px rgba(0,0,0,0.09),
+    0 16px 8px rgba(0,0,0,0.09),
+    0 32px 16px rgba(0,0,0,0.09);
+}
+
+.output-selector__menu__item {
+    background-color: rgba(0,0,0,0.3);
+    margin: 2px;
+    border-radius: 3px;
+}
+
+.output-selector__menu__item[data-selected], .output-selector__menu__item:hover {
+    background-color: rgba(0,0,255,0.3);
+}
+
+.link-text {
+    position: relative;
 }
 
 .link-item {

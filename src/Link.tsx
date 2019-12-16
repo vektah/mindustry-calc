@@ -1,11 +1,11 @@
 import { h } from "preact";
-import { view, ViewData } from "./state";
+import { ViewData } from "./state";
 import { Link as LinkData } from "./solver/solver";
 import GenericCrafter from "./game/GenericCrafter";
 
 const items = require("../public/mindustry/sprites/items/*.png");
 
-function Link({
+export default function Link({
   link: { source, destination, required },
 }: {
   link: LinkData<ViewData, GenericCrafter>;
@@ -34,5 +34,3 @@ function Link({
     </div>
   );
 }
-
-export default view(Link);

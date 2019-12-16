@@ -1,21 +1,27 @@
 import { h, render } from "preact";
 import Block from "./Block";
-import { state, view } from "./state";
+import { useAppState } from "./state";
 import Link from "./Link";
 import Menu from "./Menu";
 
-const App = view(() => {
+function App() {
+  const state = useAppState();
+
   return (
     <div className="root">
-      <Menu />
-      <div className="graph">
-        {state.blocks.map(a => a.outputs.map(b => <Link link={b} />))}
-        {state.blocks.map(b => (
-          <Block block={b} />
-        ))}
-      </div>
+      <Menu state={state} />
+      {state.root && (
+        <div className="graph">
+          {Array.from(state.root.walk()).map(([a]) =>
+            a.outputs.map(b => <Link link={b} />),
+          )}
+          {Array.from(state.root.walk()).map(([b]) => (
+            <Block block={b} />
+          ))}
+        </div>
+      )}
     </div>
   );
-});
+}
 
 render(<App />, document.getElementById("app"));

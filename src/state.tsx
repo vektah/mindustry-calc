@@ -59,163 +59,153 @@ export interface ViewData {
   center: Point;
   ref: RefObject<HTMLDivElement>;
   count: number;
+  redraw(): void;
 }
 
-export class State {
-  blocks: ProductionNode<ViewData, GenericCrafter>[] = [];
-  results: ProductionNode<ViewData, GenericCrafter>[] = [];
+export function useAppState() {
+  const [target, setTarget] = useState<ItemStack>(
+    new ItemStack(Items.graphite, 100),
+  );
 
-  solve() {
-    this.results = Array.from(
-      solve<ViewData, GenericCrafter>(
-        producers,
-        new ItemStack(Items.surgealloy, 10),
+  function doSolve() {
+    return Array.from(solve<ViewData, GenericCrafter>(producers, target));
+  }
+
+  const [tv, trigger] = useState(undefined);
+  useEffect(() => {}, [tv]);
+
+  const [results, setResults] = useState<
+    ProductionNode<ViewData, GenericCrafter>[]
+  >(undefined);
+
+  useEffect(() => {
+    const results = doSolve();
+
+    for (const result of results) {
+      for (const [node] of result.walk()) {
+        node.data = {
+          center: new Point(
+            Math.random() * 500 + 100,
+            Math.random() * 500 + 100,
+          ),
+          count: 1,
+          ref: { current: undefined },
+          redraw() {
+            console.log(node.data.center);
+            trigger(Math.random());
+          },
+        };
+      }
+      for (let i = 0; i < 200; i++) {
+        forceLayout(result);
+      }
+    }
+
+    setResults(results);
+  }, [target]);
+
+  const [active, setActive] = useState<number>(0);
+
+  useEffect(() => {
+    if (!results) return;
+  }, [active, results]);
+
+  return {
+    target,
+    setTarget,
+    results,
+    setResults,
+    active,
+    setActive,
+    root: results && results[active],
+  };
+}
+
+export type AppState = ReturnType<typeof useAppState>;
+
+function calcForce(a: Point, b: Point, f: (dist: number) => number) {
+  const vector = a.sub(b);
+  let correction = f(vector.mag());
+
+  return vector.normThis().scaleThis(correction);
+}
+
+function forceLayout(root: ProductionNode<ViewData, GenericCrafter>) {
+  const c1 = 50;
+  const c2 = 100;
+  const c3 = 100000;
+
+  let minX = 9999999;
+  let minY = 9999999;
+  for (const [block] of root.walk()) {
+    if (block.data.center.x < minX) {
+      minX = block.data.center.x;
+    }
+    if (block.data.center.y < minY) {
+      minY = block.data.center.y;
+    }
+  }
+
+  for (const [block] of root.walk()) {
+    if (block === root) {
+      block.data.center.x = block.data.center.x + (-minX + 100) / 10;
+      block.data.center.y = block.data.center.y + (-minY + 100) / 10;
+      continue;
+    }
+    if (block.data.center.x < 10) {
+      block.data.center.x = 10;
+    }
+    if (block.data.center.y < 10) {
+      block.data.center.y = 10;
+    }
+
+    const totalCorrection = new Point(-13, -6);
+
+    for (const link of block.outputs) {
+      if (!link.destination) continue;
+      totalCorrection.addThis(
+        calcForce(
+          block.data.center,
+          link.destination.data.center,
+          d => c1 * Math.log(c2 / d),
+        ),
+      );
+    }
+
+    for (const link of block.inputs) {
+      if (!link.source) continue;
+      totalCorrection.addThis(
+        calcForce(
+          block.data.center,
+          link.source.data.center,
+          d => c1 * Math.log(c2 / d),
+        ),
+      );
+    }
+
+    for (const [other] of root.walk()) {
+      if (block === other) continue;
+      totalCorrection.addThis(
+        calcForce(block.data.center, other.data.center, d => c3 / (d * d)),
+      );
+    }
+
+    totalCorrection.addThis(
+      calcForce(
+        block.data.center,
+        new Point(0, block.data.center.y),
+        d => c3 / (d * d),
       ),
     );
 
-    this.setActive(0);
-  }
-
-  setActive(n: number) {
-    this.blocks = [];
-    for (const [node, depth] of state.results[n].walk()) {
-      node.data = {
-        center: new Point(Math.random() * 500 + 100, Math.random() * 500 + 100),
-        count: 1,
-        ref: { current: undefined },
-      };
-      state.blocks.push(node);
-    }
-
-    for (let i = 0; i < 500; i++) {
-      this.forceLayout();
-    }
-    // setInterval(() => state.forceLayout(), 30);
-  }
-
-  calcForce(a: Point, b: Point, f: (dist: number) => number) {
-    const vector = a.sub(b);
-    let correction = f(vector.mag());
-
-    return vector.normThis().scaleThis(correction);
-  }
-
-  forceLayout() {
-    const c1 = 50;
-    const c2 = 100;
-    const c3 = 100000;
-
-    let minX = 9999999;
-    let minY = 9999999;
-    for (const block of state.blocks) {
-      if (block.data.center.x < minX) {
-        minX = block.data.center.x;
-      }
-      if (block.data.center.y < minY) {
-        minY = block.data.center.y;
-      }
-    }
-
-    for (const block of state.blocks) {
-      if (block === state.blocks[0]) {
-        block.data.center.x = block.data.center.x + (-minX + 100) / 10;
-        block.data.center.y = block.data.center.y + (-minY + 100) / 10;
-        continue;
-      }
-      if (block.data.center.x < 10) {
-        block.data.center.x = 10;
-      }
-      if (block.data.center.y < 10) {
-        block.data.center.y = 10;
-      }
-
-      const totalCorrection = new Point(-20, 0);
-
-      for (const link of block.outputs) {
-        if (!link.destination) continue;
-        totalCorrection.addThis(
-          this.calcForce(
-            block.data.center,
-            link.destination.data.center,
-            d => c1 * Math.log(c2 / d),
-          ),
-        );
-      }
-
-      for (const other of state.blocks) {
-        if (block === other) continue;
-        totalCorrection.addThis(
-          this.calcForce(
-            block.data.center,
-            other.data.center,
-            d => c3 / (d * d),
-          ),
-        );
-      }
-
-      totalCorrection.addThis(
-        this.calcForce(
-          block.data.center,
-          new Point(0, block.data.center.y),
-          d => c3 / (d * d),
-        ),
-      );
-
-      totalCorrection.addThis(
-        this.calcForce(
-          block.data.center,
-          new Point(block.data.center.x, 0),
-          d => c3 / (d * d),
-        ),
-      );
-
-      block.data.center.addThis(totalCorrection);
-    }
-  }
-}
-
-export function view<T>(Comp: FunctionalComponent<T>): FunctionalComponent<T> {
-  let ReactiveComp;
-
-  ReactiveComp = memo(props => {
-    // use a dummy setState to update the component
-    const [, setState] = useState(undefined);
-
-    // create a memoized reactive wrapper of the original component (render)
-    // at the very first run of the component function
-    const render = useMemo(
-      () =>
-        observe(Comp, {
-          scheduler: () => setState({}),
-          lazy: true,
-        }),
-      // Adding the original Comp here is necessary to make React Hot Reload work
-      // it does not affect behavior otherwise
-      [Comp],
+    totalCorrection.addThis(
+      calcForce(
+        block.data.center,
+        new Point(block.data.center.x, 0),
+        d => c3 / (d * d),
+      ),
     );
 
-    // cleanup the reactive connections after the very last render of the component
-    useEffect(() => {
-      return () => unobserve(render);
-    }, []);
-
-    // run the reactive render instead of the original one
-    return render(props as any);
-  });
-
-  ReactiveComp.displayName = Comp.displayName + "View";
-  // static props are inherited by class components,
-  // but have to be copied for function components
-  for (let key of Object.keys(Comp)) {
-    // @ts-ignore
-    ReactiveComp[key] = Comp[key];
+    block.data.center.addThis(totalCorrection);
   }
-
-  return ReactiveComp;
 }
-
-export const state = observable(new State());
-state.solve();
-
-window.Blocks = Blocks;
-window.state = state;
