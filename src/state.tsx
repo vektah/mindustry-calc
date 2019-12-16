@@ -4,7 +4,7 @@ import { memo } from "preact/compat";
 import { FunctionalComponent, h, RefObject } from "preact";
 import { ProductionNode, solve } from "./solver/solver";
 import Items from "./game/Items";
-import producers from "./game/producers";
+import producers, { beltThroughput } from "./game/producers";
 import ItemStack from "./game/ItemStack";
 import GenericCrafter from "./game/GenericCrafter";
 import Blocks from "./game/Blocks";
@@ -64,7 +64,7 @@ export interface ViewData {
 
 export function useAppState() {
   const [target, setTarget] = useState<ItemStack>(
-    new ItemStack(Items.graphite, 100),
+    new ItemStack(Items.silicon, beltThroughput),
   );
 
   function doSolve() {
@@ -94,9 +94,12 @@ export function useAppState() {
       for (const [node, depth] of result.walk()) {
         const y = depthOffset.get(depth) || 0;
         depthOffset.set(depth, y + 1);
+
+        const multiplier = node.templateMultiplier();
+
         node.data = {
           center: new Point((maxDepth - depth) * 150 + 100, y * 150 + 100),
-          count: 1,
+          count: node.template.craftTime * multiplier,
           ref: { current: undefined },
           redraw() {
             trigger(Math.random());

@@ -42,7 +42,7 @@ export default function Menu({ state }: { state: AppState }) {
             ))}
           </div>
         )}
-        / min:
+        / sec:
         <input
           className="output-selector__count"
           value={state.target.count}

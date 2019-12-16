@@ -2,8 +2,7 @@ import { h } from "preact";
 import { ViewData } from "./state";
 import { Link as LinkData } from "./solver/solver";
 import GenericCrafter from "./game/GenericCrafter";
-
-const items = require("../public/mindustry/sprites/items/*.png");
+import { itemImage } from "./images";
 
 export default function Link({
   link: { source, destination, required },
@@ -27,10 +26,8 @@ export default function Link({
         )}rad)`,
       }}
     >
-      <div>
-        <img className="link-item" src={items["item-" + required.item.name]} />
-        <div>{required.count.toFixed(2)}</div>
-      </div>
+      <img className="link-item" src={itemImage(required.item)} />
+      <div>{required.count.toFixed(2)}</div>
     </div>
   );
 }

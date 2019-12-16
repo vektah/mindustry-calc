@@ -6,6 +6,8 @@ import Liquids from "./Liquids";
 
 let producers: GenericCrafter[] = [];
 
+export const beltThroughput = 4.37;
+
 for (const name of Object.keys(Blocks)) {
   // @ts-ignore
   const block = Blocks[name];

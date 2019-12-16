@@ -107,7 +107,7 @@ export class ProductionNode<DataType, TemplateType extends Template> {
     }
   }
 
-  requiredInputAmount(name: string): number {
+  templateMultiplier() {
     const total: { [item: string]: number } = {};
 
     for (const dest of this.outputs) {
@@ -123,10 +123,15 @@ export class ProductionNode<DataType, TemplateType extends Template> {
         maxMultipler = multiplier;
       }
     }
+    return maxMultipler;
+  }
+
+  requiredInputAmount(name: string): number {
+    const templateMultiplier = this.templateMultiplier();
 
     const input = this.template.inputs.find(f => f.item == name);
     if (!input) return 0;
-    return input.count * maxMultipler;
+    return input.count * templateMultiplier;
   }
 
   static clone<DataType, TemplateType extends Template>(

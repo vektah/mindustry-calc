@@ -16,7 +16,7 @@ export default function Block({
 }) {
   return (
     <Draggable
-      className="block"
+      className="block hover-target"
       pos={block.data.center}
       setPos={(x, y) => {
         block.data.center.x = x;
@@ -29,6 +29,22 @@ export default function Block({
       }}
     >
       <Label>{block.template.name}</Label>
+      <div className="hover-card">
+        <table>
+          <tr>
+            <td>basic</td>
+            <td>{block.data.count.toFixed(2)}</td>
+          </tr>
+          <tr>
+            <td>overdrive</td>
+            <td>{(block.data.count / 1.5).toFixed(2)}</td>
+          </tr>
+          <tr>
+            <td>od+phase</td>
+            <td>{(block.data.count / 2.125).toFixed(2)}</td>
+          </tr>
+        </table>
+      </div>
     </Draggable>
   );
 }
