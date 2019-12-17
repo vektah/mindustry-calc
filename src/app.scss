@@ -66,7 +66,7 @@ body {
     padding: 0px 5px;
 }
 
-.menu-item:hover {
+.menu-item:hover, .menu-item[data-active] {
     background-color: $text;
 }
 
@@ -96,15 +96,11 @@ table {
     color: inherit;
 }
 
-
 .hover-target:hover {
     .hover-card {
         opacity: .7;
     }
 }
-
-
-
 
 .link {
     height: $belt-width;
@@ -138,7 +134,17 @@ table {
     background-color: $lighter;
     border: none;
     margin: 5px;
+    width: 50px;
     flex-grow: 1;
+}
+
+.output-selector__sort {
+    width: 100px;
+    height: 24px;
+    margin: 5px;
+    color: #333;
+    border: none;
+    background-color: $lighter;
 }
 
 .output-selector__menu {

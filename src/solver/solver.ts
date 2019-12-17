@@ -184,6 +184,16 @@ export class ProductionNode<DataType, TemplateType extends Template> {
     return nodes.map(n => seen.get(n));
   }
 
+  map<T>(
+    f: (node: ProductionNode<DataType, TemplateType>, depth: number) => T,
+  ): T[] {
+    let res: T[] = [];
+    for (const [node, depth] of this.walk()) {
+      res.push(f(node, depth));
+    }
+    return res;
+  }
+
   *walk(): Generator<[ProductionNode<DataType, TemplateType>, number]> {
     const seen = new Set<ProductionNode<DataType, TemplateType>>();
     const unseen: [ProductionNode<DataType, TemplateType>, number][] = [

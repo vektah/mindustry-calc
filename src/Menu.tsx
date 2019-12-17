@@ -47,25 +47,42 @@ export default function Menu({ state }: { state: AppState }) {
           className="output-selector__count"
           value={state.target.count}
           onChange={e => {
-            state.setTarget(new ItemStack(state.target.item, e.target.value));
+            state.setTarget(
+              new ItemStack(state.target.item, parseFloat(e.target.value)),
+            );
           }}
         />
+        <select
+          value={state.sort}
+          onChange={e => state.setSort(e.target.value)}
+          className="output-selector__sort"
+        >
+          {["min power", "max power", "scarcity"].map(v => (
+            <option selected={v == state.sort} value={v}>
+              {v}
+            </option>
+          ))}
+        </select>
       </div>
       {state.results &&
-        state.results.map((s, index) => (
-          <div
-            className="menu-item"
-            onClick={() => {
-              state.setActive(index);
-            }}
-          >
-            {s.calcBaseInputs().map(i => (
-              <div>
-                {i.count.toFixed(2)} {i.item.name}
-              </div>
-            ))}
-          </div>
-        ))}
+        state.results.map((s, index) => {
+          return (
+            <div
+              className="menu-item "
+              data-active={index == state.active}
+              onClick={() => {
+                state.setActive(index);
+              }}
+            >
+              {s.baseInputs.map(i => (
+                <div>
+                  {i && i.count && i.count.toFixed(2)} {i.item.name}
+                </div>
+              ))}
+              {s.totalPower > 0 && <div>{s.totalPower.toFixed(0)} power</div>}
+            </div>
+          );
+        })}
     </div>
   );
 }

@@ -12,10 +12,10 @@ function App() {
       <Menu state={state} />
       {state.root && (
         <div className="graph">
-          {Array.from(state.root.walk()).map(([a]) =>
+          {Array.from(state.root.root.walk()).map(([a]) =>
             a.outputs.map(b => <Link link={b} />),
           )}
-          {Array.from(state.root.walk()).map(([b]) => (
+          {Array.from(state.root.root.walk()).map(([b]) => (
             <Block block={b} />
           ))}
         </div>

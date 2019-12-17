@@ -512,7 +512,6 @@ export default {
 
     result: Liquids.oil,
     updateEffect: "pulverize",
-    liquidCapacity: 50,
     updateEffectChance: 0.05,
     pumpAmount: 0.25,
     size: 3,

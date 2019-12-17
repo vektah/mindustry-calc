@@ -1,13 +1,13 @@
-import { observable, observe, unobserve } from "@nx-js/observer-util";
-import { useEffect, useMemo, useState } from "preact/hooks";
-import { memo } from "preact/compat";
-import { FunctionalComponent, h, RefObject } from "preact";
+import { useEffect, useState } from "preact/hooks";
+import { h, RefObject } from "preact";
 import { ProductionNode, solve } from "./solver/solver";
 import Items from "./game/Items";
-import producers, { beltThroughput } from "./game/producers";
+import producers from "./game/producers";
 import ItemStack from "./game/ItemStack";
 import GenericCrafter from "./game/GenericCrafter";
 import Blocks from "./game/Blocks";
+import { Item } from "./game/item";
+import Liquids from "./game/Liquids";
 
 export class Point {
   x: number;
@@ -59,13 +59,54 @@ export interface ViewData {
   center: Point;
   ref: RefObject<HTMLDivElement>;
   count: number;
+  power: number;
   redraw(): void;
+}
+
+export interface Solution {
+  root: ProductionNode<ViewData, GenericCrafter>;
+  baseInputs: ItemStack[];
+  totalPower: number;
+}
+
+export type SortBy = "min power" | "max power" | "scarcity";
+
+function calcScarcity(items: ItemStack[]): number {
+  let rareity = 0;
+  for (const item of items) {
+    rareity += itemScarcity(item.item);
+  }
+  return rareity;
+}
+
+function itemScarcity(item: Item): number {
+  switch (item) {
+    case Items.coal:
+    case Items.copper:
+    case Items.lead:
+      return 1;
+
+    case Liquids.water:
+      return 0.01;
+    case Items.sand:
+      return 0.5;
+
+    case Liquids.oil:
+    case Items.titanium:
+    case Items.thorium:
+      return 10;
+
+    default:
+      return 2;
+  }
 }
 
 export function useAppState() {
   const [target, setTarget] = useState<ItemStack>(
     new ItemStack(Items.graphite, 4),
   );
+
+  const [sort, setSort] = useState<SortBy>("scarcity");
 
   function doSolve() {
     return Array.from(solve<ViewData, GenericCrafter>(producers, target));
@@ -74,13 +115,23 @@ export function useAppState() {
   const [tv, trigger] = useState(undefined);
   useEffect(() => {}, [tv]);
 
-  const [results, setResults] = useState<
-    ProductionNode<ViewData, GenericCrafter>[]
-  >(undefined);
+  const [results, setResults] = useState<Solution[]>(undefined);
+
+  function sortFn(a: Solution, b: Solution) {
+    switch (sort) {
+      case "min power":
+        return a.totalPower - b.totalPower;
+      case "max power":
+        return b.totalPower - a.totalPower;
+      case "scarcity":
+        return calcScarcity(a.baseInputs) - calcScarcity(b.baseInputs);
+    }
+  }
 
   useEffect(() => {
     const results = doSolve();
 
+    let solutions: Solution[] = [];
     for (const result of results) {
       let maxDepth = 0;
       for (const [node, depth] of result.walk()) {
@@ -91,7 +142,9 @@ export function useAppState() {
 
       // lets try and lay things out so that force based graph algorithm can quickly converge
       const depthOffset = new Map<number, number>();
+      let totalPower = 0;
       for (const [node, depth] of result.walk()) {
+        totalPower += node.template.power;
         const y = depthOffset.get(depth) || 0;
         depthOffset.set(depth, y + 1);
 
@@ -100,6 +153,7 @@ export function useAppState() {
         node.data = {
           center: new Point((maxDepth - depth) * 150 + 100, y * 150 + 100),
           count: node.template.craftSeconds * multiplier,
+          power: node.template.power * multiplier,
           ref: { current: undefined },
           redraw() {
             trigger(Math.random());
@@ -109,10 +163,26 @@ export function useAppState() {
       for (let i = 0; i < 100; i++) {
         forceLayout(result);
       }
+
+      solutions.push({
+        root: result,
+        totalPower,
+        baseInputs: result.calcBaseInputs(),
+      });
     }
 
-    setResults(results);
+    solutions.sort(sortFn);
+
+    setResults(solutions);
   }, [target]);
+
+  useEffect(() => {
+    if (!results) return;
+    const newResults = [...results];
+
+    newResults.sort(sortFn);
+    setResults(newResults);
+  }, [sort]);
 
   const [active, setActive] = useState<number>(0);
 
@@ -121,6 +191,8 @@ export function useAppState() {
   }, [active, results]);
 
   return {
+    sort,
+    setSort,
     target,
     setTarget,
     results,

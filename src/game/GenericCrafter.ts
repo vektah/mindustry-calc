@@ -9,6 +9,7 @@ export default class GenericCrafter {
   outputs: ItemStack[] = [];
   craftSeconds: number;
   craftTicks: number;
+  power: number = 0;
 
   constructor(name: string, opts: CrafterOptions) {
     this.name = name;
@@ -31,6 +32,10 @@ export default class GenericCrafter {
 
     this.craftTicks = opts.craftTime || 80;
     this.craftSeconds = this.craftTicks / 60;
+
+    if (opts.consumesPower) {
+      this.power = opts.consumesPower[0] * this.craftTicks;
+    }
 
     // Some liquids are in per tick values, we need to normalize based on craft time.
     for (const input of this.inputs) {
@@ -113,5 +118,6 @@ export interface CrafterOptions {
   craftTime?: number;
   pumpAmount?: number;
   result?: Liquid;
+  consumesPower?: [number];
   [key: string]: any;
 }

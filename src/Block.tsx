@@ -43,6 +43,10 @@ export default function Block({
             <td>od+phase</td>
             <td>{(block.data.count / 2.125).toFixed(2)}</td>
           </tr>
+          <tr>
+            <td>power</td>
+            <td>{block.data.power.toFixed(0)}</td>
+          </tr>
         </table>
       </div>
     </Draggable>
