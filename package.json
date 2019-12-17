@@ -4,6 +4,7 @@
   "private": true,
   "devDependencies": {
     "@types/jest": "^24.0.23",
+    "cssnano": "^4.1.10",
     "got": "^10.0.3",
     "jest": "^24.9.0",
     "prettier": "^1.19.1",
@@ -21,6 +22,7 @@
   },
   "scripts": {
     "dev": "parcel index.html",
+    "build": "parcel build index.html",
     "import": "ts-node bin/import.ts"
   }
 }
