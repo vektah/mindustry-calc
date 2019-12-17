@@ -36,7 +36,7 @@ for (const name of Object.keys(Blocks)) {
 [Liquids.water, Liquids.oil].forEach(i =>
   producers.push(
     new GenericCrafter("pump-" + i.name, {
-      outputItem: new ItemStack(i, 1),
+      outputItem: new ItemStack(i, 0.8),
     }),
   ),
 );

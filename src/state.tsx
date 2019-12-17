@@ -64,7 +64,7 @@ export interface ViewData {
 
 export function useAppState() {
   const [target, setTarget] = useState<ItemStack>(
-    new ItemStack(Items.silicon, beltThroughput),
+    new ItemStack(Items.graphite, 4),
   );
 
   function doSolve() {
@@ -99,7 +99,7 @@ export function useAppState() {
 
         node.data = {
           center: new Point((maxDepth - depth) * 150 + 100, y * 150 + 100),
-          count: node.template.craftTime * multiplier,
+          count: node.template.craftSeconds * multiplier,
           ref: { current: undefined },
           redraw() {
             trigger(Math.random());
@@ -130,6 +130,8 @@ export function useAppState() {
     root: results && results[active],
   };
 }
+
+window.blocks = Blocks;
 
 export type AppState = ReturnType<typeof useAppState>;
 

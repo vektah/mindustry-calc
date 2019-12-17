@@ -7,7 +7,8 @@ export default class GenericCrafter {
   name: string;
   inputs: ItemStack[] = [];
   outputs: ItemStack[] = [];
-  craftTime: number;
+  craftSeconds: number;
+  craftTicks: number;
 
   constructor(name: string, opts: CrafterOptions) {
     this.name = name;
@@ -24,7 +25,24 @@ export default class GenericCrafter {
     if (opts.outputLiquids) this.outputs = opts.outputsLiquids;
     if (opts.outputLiquid) this.outputs = [makeStack(opts.outputLiquid)];
 
-    this.craftTime = opts.craftTime / 60 || 80 / 60;
+    if (opts.result) {
+      this.outputs.push(new LiquidStack(opts.result, opts.pumpAmount || 1));
+    }
+
+    this.craftTicks = opts.craftTime || 80;
+    this.craftSeconds = this.craftTicks / 60;
+
+    // Some liquids are in per tick values, we need to normalize based on craft time.
+    for (const input of this.inputs) {
+      if (input.item instanceof Liquid && input.count < 1) {
+        input.count *= this.craftTicks;
+      }
+    }
+    for (const output of this.outputs) {
+      if (output.item instanceof Liquid && output.count < 1) {
+        output.count *= this.craftTicks;
+      }
+    }
   }
 
   outputRate(opts: CraftingCalcOpts = {}): ItemStack[] {
@@ -43,30 +61,22 @@ export default class GenericCrafter {
     return (i: ItemStack) =>
       new ItemStack(
         i.item,
-        (i.count / this.craftTime) * machines * odRatio[overdrive] * efficiency,
+        (i.count / this.craftSeconds) *
+          machines *
+          odRatio[overdrive] *
+          efficiency,
       );
   }
 }
-
-export class GenericSmelter extends GenericCrafter {}
-export class LiquidConverter extends GenericCrafter {}
-export class Separator extends GenericCrafter {}
-export class SolidPump extends GenericCrafter {
-  constructor(
-    name: string,
-    opts: CrafterOptions & { pumpAmount: number; result: Liquid },
-  ) {
-    super(name, {
-      outputLiquid: new LiquidStack(opts.result, opts.pumpAmount),
-      ...opts,
-    });
-  }
-}
-export class Cultivator extends GenericCrafter {}
-export class Fracker extends SolidPump {}
-
-export class Pump extends GenericCrafter {}
+export class LiquidCrafter extends GenericCrafter {}
 export class Drill extends GenericCrafter {}
+export class GenericSmelter extends GenericCrafter {}
+export class Cultivator extends GenericCrafter {}
+export class LiquidConverter extends LiquidCrafter {}
+export class Separator extends GenericCrafter {}
+export class SolidPump extends LiquidCrafter {}
+export class Fracker extends SolidPump {}
+export class Pump extends LiquidCrafter {}
 
 interface CraftingCalcOpts {
   efficiency?: number;
@@ -101,5 +111,7 @@ export interface CrafterOptions {
   outputLiquids?: LiquidStack[];
   outputLiquid?: liquidLike;
   craftTime?: number;
+  pumpAmount?: number;
+  result?: Liquid;
   [key: string]: any;
 }
