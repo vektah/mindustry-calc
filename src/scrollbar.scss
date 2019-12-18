@@ -1,13 +1,13 @@
-@mixin scrollbar {
+@mixin scrollbar($track-color) {
   scrollbar-width: thin;
-  scrollbar-color: $highlight $menu-background;
+  scrollbar-color: $highlight $track-color;
 
   &::-webkit-scrollbar {
     width: 4px;
   }
 
   &::-webkit-scrollbar-track {
-    background: $menu-background;
+    background: $track-color;
   }
 
   &::-webkit-scrollbar-thumb {

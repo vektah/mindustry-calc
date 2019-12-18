@@ -116,6 +116,8 @@ select:-moz-focusring {
 .graph {
   grid-area: solution;
   position: relative;
+  overflow-y: auto;
+  @include scrollbar($solution-background);
 }
 
 .hover-card {

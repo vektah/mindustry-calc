@@ -215,7 +215,7 @@ export class ProductionNode<DataType, TemplateType extends Template> {
       node.outputs
         .filter(s => s.destination && !seen.has(s.destination))
         .map(s => {
-          unseen.push([s.destination, depth - 1]);
+          unseen.push([s.destination, depth + 1]);
           seen.add(s.destination);
         });
 

@@ -133,25 +133,18 @@ export function useAppState() {
 
     let solutions: Solution[] = [];
     for (const result of results) {
-      let maxDepth = 0;
-      for (const [node, depth] of result.walk()) {
-        if (depth > maxDepth) {
-          maxDepth = depth;
-        }
-      }
-
       // lets try and lay things out so that force based graph algorithm can quickly converge
       const depthOffset = new Map<number, number>();
       let totalPower = 0;
       for (const [node, depth] of result.walk()) {
         totalPower += node.template.power;
-        const y = depthOffset.get(depth) || 0;
-        depthOffset.set(depth, y + 1);
+        const x = depthOffset.get(depth) || 0;
+        depthOffset.set(depth, x + 1);
 
         const multiplier = node.templateMultiplier();
 
         node.data = {
-          center: new Point((maxDepth - depth) * 150 + 100, y * 150 + 100),
+          center: new Point(x * 150 + 100, depth * 150 + 100),
           count: node.template.craftSeconds * multiplier,
           power: node.template.power * multiplier,
           ref: { current: undefined },
@@ -160,7 +153,7 @@ export function useAppState() {
           },
         };
       }
-      for (let i = 0; i < 100; i++) {
+      for (let i = 0; i < 200; i++) {
         forceLayout(result);
       }
 
@@ -190,6 +183,19 @@ export function useAppState() {
     if (!results) return;
   }, [active, results]);
 
+  // useful when debugging force layout
+  // useEffect(() => {
+  //   const int = setInterval(() => {
+  //     if (!results) return;
+  //     forceLayout(results[active].root);
+  //
+  //     setResults([...results]);
+  //   }, 100);
+  //   return () => {
+  //     clearInterval(int);
+  //   };
+  // }, [active]);
+
   return {
     sort,
     setSort,
@@ -215,7 +221,7 @@ function calcForce(a: Point, b: Point, f: (dist: number) => number) {
 }
 
 function forceLayout(root: ProductionNode<ViewData, GenericCrafter>) {
-  const c1 = 50;
+  const c1 = 100;
   const c2 = 100;
   const c3 = 100000;
 
@@ -243,7 +249,7 @@ function forceLayout(root: ProductionNode<ViewData, GenericCrafter>) {
       block.data.center.y = 10;
     }
 
-    const totalCorrection = new Point(-13, -6);
+    const totalCorrection = new Point(0, 5);
 
     for (const link of block.outputs) {
       if (!link.destination) continue;
@@ -274,11 +280,12 @@ function forceLayout(root: ProductionNode<ViewData, GenericCrafter>) {
       );
     }
 
+    // forces to keep off the edge
     totalCorrection.addThis(
       calcForce(
         block.data.center,
         new Point(0, block.data.center.y),
-        d => c3 / (d * d),
+        d => 5000 / (d * d * d),
       ),
     );
 
@@ -286,7 +293,7 @@ function forceLayout(root: ProductionNode<ViewData, GenericCrafter>) {
       calcForce(
         block.data.center,
         new Point(block.data.center.x, 0),
-        d => c3 / (d * d),
+        d => 5000 / (d * d * d),
       ),
     );
 
