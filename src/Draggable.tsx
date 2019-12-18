@@ -28,7 +28,8 @@ export default function Draggable({
   return (
     <div
       style={{ left: pos.x, top: pos.y, ...(style as object) }}
-      onmousedown={e => {
+      onMouseDown={e => {
+        if (e.which !== 2) return;
         e.preventDefault();
         const startX = e.clientX - pos.x;
         const startY = e.clientY - pos.y;

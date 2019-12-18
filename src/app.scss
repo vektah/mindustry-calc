@@ -13,7 +13,7 @@ $highlight: rgba(51, 101, 138, 1);
 $menu-background: rgba(31, 32, 65, 1);
 $solution-background: rgb(12, 12, 22);
 $black: rgba(7, 7, 7, 1);
-$light-text: rgba(233, 243, 242, 1);
+$light-text: rgb(235, 233, 221);
 $dark-text: $black;
 
 // Small tablets and large smartphones (landscape view)
@@ -52,6 +52,7 @@ $screen-desktop-min: 1200px;
 @import "src/input.scss";
 @import "src/HamburgerButton.scss";
 @import "src/Menu.scss";
+@import "src/Link.scss";
 
 html {
   font-size: 100%;
@@ -82,6 +83,8 @@ body {
   &-label {
     background-color: rgba(0, 0, 0, 0.5);
     font-size: 13px;
+    pointer-events: none;
+    user-select: none;
   }
 }
 
@@ -122,8 +125,6 @@ select:-moz-focusring {
 
 .hover-card {
   position: absolute;
-  top: $block-size + 4;
-  left: -2px;
   background-color: $menu-background;
   color: $light-text;
   padding: $space;
@@ -131,42 +132,25 @@ select:-moz-focusring {
   box-shadow: 0 2px 1px rgba(0, 0, 0, 0.09), 0 4px 2px rgba(0, 0, 0, 0.09),
     0 8px 4px rgba(0, 0, 0, 0.09), 0 16px 8px rgba(0, 0, 0, 0.09),
     0 32px 16px rgba(0, 0, 0, 0.09);
-  z-index: 10;
+  z-index: 6;
+  display: none;
 
-  opacity: 0;
+  &[data-show] {
+    display: block;
+  }
 }
 
 table {
   color: inherit;
 }
 
-.hover-target:hover {
-  .hover-card {
-    opacity: 1;
-  }
-}
-
-.link {
-  height: $belt-width;
+.hint-text {
   position: absolute;
-  border-left: 1px dashed red;
-  transform-origin: 0% 50%;
-  background: url("../public/mindustry/sprites/blocks/distribution/conveyors/conveyor-0-0.png");
-  background-size: $belt-width $belt-width;
-  box-sizing: border-box;
-  text-align: center;
-  z-index: 0;
-}
-
-.link-text {
-  position: relative;
-}
-
-.link-item {
-  height: $belt-width * 1.5;
-  width: $belt-width * 1.5;
-  transform: translate(0, -$belt-width/4);
-
-  filter: drop-shadow(1px 0 0 black) drop-shadow(-1px 0 0 black)
-    drop-shadow(0 1px 0 black) drop-shadow(0 -1px 0 black);
+  right: 16px;
+  bottom: 0;
+  padding: $space-double;
+  color: $light-text;
+  opacity: 20%;
+  user-select: none;
+  z-index: -1;
 }

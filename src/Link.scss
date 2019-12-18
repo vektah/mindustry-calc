@@ -1,0 +1,45 @@
+.link {
+  height: $belt-width;
+  position: absolute;
+  border-left: 1px dashed red;
+  transform-origin: 0% 50%;
+  background: url("../public/mindustry/sprites/blocks/distribution/conveyors/conveyor-0-0.png");
+  background-size: $belt-width $belt-width;
+  box-sizing: border-box;
+  text-align: center;
+  z-index: 0;
+}
+
+.link-text {
+  position: relative;
+}
+
+.link-item {
+  position: absolute;
+
+  transform: translate(-$belt-width, -$belt-width/2);
+  z-index: 5;
+
+  img {
+    height: $belt-width * 2;
+    width: $belt-width * 2;
+    filter: drop-shadow(2px 0 0 $black) drop-shadow(-2px 0 0 $black)
+      drop-shadow(0 2px 0 $black) drop-shadow(0 -2px 0 $black);
+    user-select: none;
+  }
+
+  .link-text {
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    text-align: center;
+    line-height: $belt-width * 3;
+    position: absolute;
+    font-weight: bolder;
+    pointer-events: none;
+    user-select: none;
+
+    -webkit-text-stroke: 0.5px $black;
+  }
+}

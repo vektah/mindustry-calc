@@ -20,6 +20,10 @@ function App() {
           ))}
         </div>
       )}
+      <div className="hint-text">
+        <p>Click a node for more details.</p>
+        <p>Middle mouse to drag</p>
+      </div>
     </div>
   );
 }
