@@ -4,15 +4,18 @@
   position: relative;
   background-color: $menu-background;
   grid-area: search;
+  padding: $space-double;
 
   .output-selector__menu {
     position: absolute;
-    top: 30px;
+    top: 42px;
     left: 0px;
     background-color: $menu-background;
-    margin: 5px;
-    padding: 1px;
+    margin: $space;
+    max-width: 254px;
+    padding: $space;
     border-radius: 3px;
+    z-index: 10;
 
     box-shadow: 0 2px 1px rgba(0, 0, 0, 0.09), 0 4px 2px rgba(0, 0, 0, 0.09),
       0 8px 4px rgba(0, 0, 0, 0.09), 0 16px 8px rgba(0, 0, 0, 0.09),
@@ -20,9 +23,9 @@
   }
 
   .output-selector__item {
-    margin: 5px;
-    width: 24px;
-    height: 24px;
+    margin: $space;
+    width: 30.7px;
+    height: 30.7px;
     border-bottom: 2px solid $highlight;
     border-radius: 2px;
     cursor: pointer;
@@ -49,20 +52,40 @@
   }
 
   .output-selector__count {
-    height: 24px;
+    height: 32px;
     background-color: $menu-background;
-    margin: 5px;
+    margin: $space;
     width: 50px;
     flex-grow: 1;
-    color: $light-text;
+    position: relative;
+
+    input {
+      height: 32px;
+      font-size: 115%;
+      padding: $space-half $space;
+      width: 100%;
+      color: $light-text;
+      background-color: transparent;
+      @include input;
+    }
+
+    &__suffix {
+      position: absolute;
+      right: $space-double;
+      color: $highlight;
+      top: 7px;
+      pointer-events: none;
+    }
   }
 
   .output-selector__sort {
     width: 100px;
-    height: 24px;
+    height: 32px;
     margin: 5px;
+    font-size: 115%;
     background-color: $menu-background;
     color: $light-text;
+    @include input;
   }
 }
 
@@ -72,6 +95,12 @@
   grid-area: results;
   background-color: $menu-background;
   display: none;
+  position: absolute;
+  top: 52px;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 8;
   @include scrollbar;
 
   &[data-is-open] {
@@ -80,14 +109,16 @@
 
   @include medium {
     display: block;
+    position: inherit;
   }
 
   .menu-item {
     background-color: $menu-background;
     color: $light-text;
     cursor: pointer;
-    padding: 5px;
-    border-bottom: 1px solid lighten($menu-background, 5%);
+    padding: $space-double $space;
+    margin: 0 $space-double;
+    border-bottom: 2px solid lighten($menu-background, 5%);
   }
 
   .menu-item:hover,

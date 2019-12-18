@@ -1,7 +1,8 @@
 .hamburger-button {
   display: inline-block;
   cursor: pointer;
-  margin-right: 6px;
+  margin-right: $space;
+  margin-left: $space-double;
 
   @include medium {
     display: none;
@@ -11,10 +12,10 @@
 .hamburger-button__bar1,
 .hamburger-button__bar2,
 .hamburger-button__bar3 {
-  width: 20px;
-  height: 2px;
+  width: 26px;
+  height: 3px;
   background-color: $highlight;
-  margin: 5px 0;
+  margin: 6px 0;
   transition: 0.4s;
   border-radius: 3px;
 }

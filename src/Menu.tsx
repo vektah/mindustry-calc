@@ -9,7 +9,7 @@ import { HamburgerButton } from "./HamburgerButton";
 
 export default function Menu({ state }: { state: AppState }) {
   const [selectMaterialMenuOpen, setSelectMaterialMenuOpen] = useState(false);
-  const [resultListMenuopen, setresultListMenuopen] = useState(false);
+  const [resultListMenuOpen, setResultListMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>();
 
   useEffect(() => {
@@ -26,7 +26,6 @@ export default function Menu({ state }: { state: AppState }) {
         <img
           onClick={() => {
             setSelectMaterialMenuOpen(true);
-            setresultListMenuopen(true);
           }}
           className="output-selector__item"
           data-selected={selectMaterialMenuOpen}
@@ -48,16 +47,17 @@ export default function Menu({ state }: { state: AppState }) {
             ))}
           </div>
         )}
-        / sec:
-        <input
-          className="output-selector__count"
-          value={state.target.count}
-          onChange={e => {
-            state.setTarget(
-              new ItemStack(state.target.item, parseFloat(e.target.value)),
-            );
-          }}
-        />
+        <div className="output-selector__count">
+          <input
+            value={state.target.count}
+            onChange={e => {
+              state.setTarget(
+                new ItemStack(state.target.item, parseFloat(e.target.value)),
+              );
+            }}
+          />
+          <div className="output-selector__count__suffix">/ sec</div>
+        </div>
         <select
           value={state.sort}
           onChange={e => state.setSort(e.target.value)}
@@ -70,13 +70,13 @@ export default function Menu({ state }: { state: AppState }) {
           ))}
         </select>
         <HamburgerButton
-          isOpen={resultListMenuopen}
+          isOpen={resultListMenuOpen}
           onClick={() => {
-            setresultListMenuopen(!resultListMenuopen);
+            setResultListMenuOpen(!resultListMenuOpen);
           }}
         />
       </div>
-      <div className="result-list" data-is-open={resultListMenuopen}>
+      <div className="result-list" data-is-open={resultListMenuOpen}>
         {state.results &&
           state.results.map((s, index) => {
             return (
@@ -85,7 +85,7 @@ export default function Menu({ state }: { state: AppState }) {
                 data-active={index == state.active}
                 onClick={() => {
                   state.setActive(index);
-                  setresultListMenuopen(false);
+                  setResultListMenuOpen(false);
                 }}
               >
                 {s.baseInputs.map(i => (

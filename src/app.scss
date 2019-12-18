@@ -3,11 +3,15 @@
 $belt-width: 16px;
 $block-size: 64px;
 
+$space: 4px;
+$space-double: 8px;
+$space-half: 2px;
+
 $belt-border: #989aa4;
 $highlight-alt: rgba(135, 179, 141, 1);
 $highlight: rgba(51, 101, 138, 1);
 $menu-background: rgba(31, 32, 65, 1);
-$solution-background: rgba(46, 46, 58, 1);
+$solution-background: rgb(12, 12, 22);
 $black: rgba(7, 7, 7, 1);
 $light-text: rgba(233, 243, 242, 1);
 $dark-text: $black;
@@ -45,11 +49,20 @@ $screen-desktop-min: 1200px;
 }
 
 @import "src/scrollbar.scss";
+@import "src/input.scss";
 @import "src/HamburgerButton.scss";
 @import "src/Menu.scss";
 
+html {
+  font-size: 100%;
+
+  @include medium {
+    font-size: 112.5%;
+  }
+}
+
 body {
-  background-color: #212121;
+  background-color: $solution-background;
   color: $light-text;
 }
 
@@ -57,7 +70,6 @@ body {
   position: absolute;
   width: $block-size;
   height: $block-size;
-  background-color: $solution-background;
   background-size: 100%;
   border: 2px solid $belt-border;
   display: flex;
@@ -96,22 +108,6 @@ body {
   height: 100%;
 }
 
-input,
-select {
-  appearance: none;
-  -moz-appearance: none;
-  -webkit-appearance: none;
-  border: none;
-  border-bottom: 2px solid $highlight;
-  border-bottom-left-radius: 2px;
-  border-bottom-right-radius: 2px;
-
-  &:focus {
-    outline: none;
-    border-bottom: 2px solid $highlight-alt;
-  }
-}
-
 select:-moz-focusring {
   color: transparent;
   text-shadow: 0 0 0 #000;
@@ -128,7 +124,7 @@ select:-moz-focusring {
   left: -2px;
   background-color: $menu-background;
   color: $light-text;
-  padding: 5px;
+  padding: $space;
   border-radius: 3px;
   box-shadow: 0 2px 1px rgba(0, 0, 0, 0.09), 0 4px 2px rgba(0, 0, 0, 0.09),
     0 8px 4px rgba(0, 0, 0, 0.09), 0 16px 8px rgba(0, 0, 0, 0.09),

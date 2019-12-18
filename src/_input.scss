@@ -1,0 +1,14 @@
+@mixin input {
+  appearance: none;
+  -moz-appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  border-bottom: 2px solid $highlight;
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+
+  &:focus {
+    outline: none;
+    border-bottom: 2px solid $highlight-alt;
+  }
+}
