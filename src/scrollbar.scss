@@ -1,0 +1,16 @@
+@mixin scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: $highlight $menu-background;
+
+  &::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: $menu-background;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: $highlight;
+  }
+}

@@ -29,6 +29,7 @@ export default function Menu({ state }: { state: AppState }) {
             setresultListMenuopen(true);
           }}
           className="output-selector__item"
+          data-selected={selectMaterialMenuOpen}
           src={itemImage(state.target.item)}
         />
         {selectMaterialMenuOpen && (

@@ -2,14 +2,14 @@
   display: flex;
   align-items: center;
   position: relative;
-  background-color: $fill;
+  background-color: $menu-background;
   grid-area: search;
 
   .output-selector__menu {
     position: absolute;
     top: 30px;
     left: 0px;
-    background-color: $lighter;
+    background-color: $menu-background;
     margin: 5px;
     padding: 1px;
     border-radius: 3px;
@@ -20,50 +20,59 @@
   }
 
   .output-selector__item {
-    background-color: $lighter;
     margin: 5px;
     width: 24px;
     height: 24px;
-    border-radius: 3px;
+    border-bottom: 2px solid $highlight;
+    border-radius: 2px;
     cursor: pointer;
 
-    .output-selector__menu__item {
-      background-color: rgba(0, 0, 0, 0.3);
-      margin: 2px;
-      border-radius: 3px;
+    &[data-selected] {
+      border-bottom: 2px solid $highlight-alt;
     }
+  }
 
-    .output-selector__menu__item[data-selected],
-    .output-selector__menu__item:hover {
-      background-color: rgba(0, 0, 255, 0.3);
+  .output-selector__menu__item {
+    background-color: lighten($menu-background, 10%);
+    margin: 2px;
+    width: 32px;
+    height: 32px;
+    display: inline-block;
+    box-sizing: border-box;
+    border-radius: 3px;
+    border: 2px solid lighten($menu-background, 10%);
+
+    &[data-selected],
+    &:hover {
+      border: 2px solid $highlight-alt;
     }
   }
 
   .output-selector__count {
     height: 24px;
-    background-color: $lighter;
-    border: none;
+    background-color: $menu-background;
     margin: 5px;
     width: 50px;
     flex-grow: 1;
+    color: $light-text;
   }
 
   .output-selector__sort {
     width: 100px;
     height: 24px;
     margin: 5px;
-    color: #333;
-    border: none;
-    background-color: $lighter;
+    background-color: $menu-background;
+    color: $light-text;
   }
 }
 
 .result-list {
   overflow-x: hidden;
   overflow-y: auto;
-  background-color: $fill;
   grid-area: results;
+  background-color: $menu-background;
   display: none;
+  @include scrollbar;
 
   &[data-is-open] {
     display: block;
@@ -74,16 +83,15 @@
   }
 
   .menu-item {
-    background-color: $lighter;
-    margin: 5px;
-    color: #1e2022;
+    background-color: $menu-background;
+    color: $light-text;
     cursor: pointer;
-    border-radius: 3px;
-    padding: 0px 5px;
+    padding: 5px;
+    border-bottom: 1px solid lighten($menu-background, 5%);
   }
 
   .menu-item:hover,
   .menu-item[data-active] {
-    background-color: $text;
+    background-color: lighten($menu-background, 5%);
   }
 }

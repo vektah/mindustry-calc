@@ -4,21 +4,25 @@
   margin-right: 6px;
 
   @include medium {
-    display:none;
+    display: none;
   }
 }
 
-.hamburger-button__bar1, .hamburger-button__bar2, .hamburger-button__bar3 {
-  width: 24px;
-  height: 3px;
-  background-color: $lighter;
-  margin: 3px 0;
+.hamburger-button__bar1,
+.hamburger-button__bar2,
+.hamburger-button__bar3 {
+  width: 20px;
+  height: 2px;
+  background-color: $highlight;
+  margin: 5px 0;
   transition: 0.4s;
+  border-radius: 3px;
 }
 
 .hamburger-button[data-is-open] {
   .hamburger-button__bar1 {
-    transform: rotate(-45deg) translate(-4px, 4px) ;
+    transform-origin: 0 50%;
+    transform: rotate(45deg);
   }
 
   .hamburger-button__bar2 {
@@ -26,6 +30,7 @@
   }
 
   .hamburger-button__bar3 {
-    transform: rotate(45deg) translate(-4px, -4px) ;
+    transform-origin: 0 50%;
+    transform: rotate(-45deg);
   }
 }
