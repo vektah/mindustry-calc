@@ -19,7 +19,7 @@
     grid-area: inputs;
     text-align: left;
     font-size: 80%;
-    opacity: 70%;
+    color: rgba(255, 255, 255, 0.7);
   }
 
   &__input {
@@ -37,6 +37,7 @@
     grid-area: power;
     text-align: right;
     font-size: 80%;
+    color: rgba(255, 255, 255, 0.7);
   }
 }
 
