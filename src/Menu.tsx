@@ -6,6 +6,7 @@ import Items from "./game/Items";
 import Liquids from "./game/Liquids";
 import { itemImage } from "./images";
 import { HamburgerButton } from "./HamburgerButton";
+import ResultItem from "./ResultItem";
 
 export default function Menu({ state }: { state: AppState }) {
   const [selectMaterialMenuOpen, setSelectMaterialMenuOpen] = useState(false);
@@ -78,25 +79,16 @@ export default function Menu({ state }: { state: AppState }) {
       </div>
       <div className="result-list" data-is-open={resultListMenuOpen}>
         {state.results &&
-          state.results.map((s, index) => {
-            return (
-              <div
-                className="menu-item "
-                data-active={index == state.active}
-                onClick={() => {
-                  state.setActive(index);
-                  setResultListMenuOpen(false);
-                }}
-              >
-                {s.baseInputs.map(i => (
-                  <div>
-                    {i && i.count && i.count.toFixed(2)} {i.item.name}
-                  </div>
-                ))}
-                {s.totalPower > 0 && <div>{s.totalPower.toFixed(0)} power</div>}
-              </div>
-            );
-          })}
+          state.results.map((s, index) => (
+            <ResultItem
+              active={index === state.active}
+              onClick={() => {
+                state.setActive(index);
+                setResultListMenuOpen(false);
+              }}
+              solution={s}
+            />
+          ))}
       </div>
     </Fragment>
   );

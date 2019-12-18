@@ -1,0 +1,46 @@
+.result-item {
+  background-color: $menu-background;
+  color: $light-text;
+  cursor: pointer;
+  padding: $space-double $space;
+  margin: 0 $space-double;
+  border-bottom: 2px solid lighten($menu-background, 5%);
+  display: grid;
+  grid-template-areas:
+    "heading heading"
+    "inputs  power";
+  grid-template-columns: auto 70px;
+
+  &__heading {
+    grid-area: heading;
+  }
+
+  &__inputs {
+    grid-area: inputs;
+    text-align: left;
+    font-size: 80%;
+    opacity: 70%;
+  }
+
+  &__input {
+    display: inline-block;
+  }
+
+  &__input__image {
+    width: 20px;
+    height: 20px;
+    position: relative;
+    top: 4px;
+  }
+
+  &__power {
+    grid-area: power;
+    text-align: right;
+    font-size: 80%;
+  }
+}
+
+.result-item:hover,
+.result-item[data-active] {
+  background-color: lighten($menu-background, 5%);
+}

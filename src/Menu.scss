@@ -111,18 +111,4 @@
     display: block;
     position: inherit;
   }
-
-  .menu-item {
-    background-color: $menu-background;
-    color: $light-text;
-    cursor: pointer;
-    padding: $space-double $space;
-    margin: 0 $space-double;
-    border-bottom: 2px solid lighten($menu-background, 5%);
-  }
-
-  .menu-item:hover,
-  .menu-item[data-active] {
-    background-color: lighten($menu-background, 5%);
-  }
 }

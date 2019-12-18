@@ -53,6 +53,7 @@ $screen-desktop-min: 1200px;
 @import "src/HamburgerButton.scss";
 @import "src/Menu.scss";
 @import "src/Link.scss";
+@import "src/ResultItem.scss";
 
 html {
   font-size: 100%;
@@ -153,4 +154,5 @@ table {
   opacity: 20%;
   user-select: none;
   z-index: -1;
+  text-align: right;
 }
