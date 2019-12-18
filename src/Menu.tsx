@@ -1,32 +1,37 @@
-import { h } from "preact";
+import { h, Fragment } from "preact";
 import { AppState } from "./state";
 import ItemStack from "./game/ItemStack";
 import { useEffect, useRef, useState } from "preact/hooks";
 import Items from "./game/Items";
 import Liquids from "./game/Liquids";
 import { itemImage } from "./images";
+import { HamburgerButton } from "./HamburgerButton";
 
 export default function Menu({ state }: { state: AppState }) {
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [selectMaterialMenuOpen, setSelectMaterialMenuOpen] = useState(false);
+  const [resultListMenuopen, setresultListMenuopen] = useState(false);
   const menuRef = useRef<HTMLDivElement>();
 
   useEffect(() => {
     document.addEventListener("mousedown", e => {
       if (!menuRef.current || menuRef.current.contains(e.target)) return;
 
-      setMenuOpen(false);
+      setSelectMaterialMenuOpen(false);
     });
   }, [menuRef.current]);
 
   return (
-    <div className="menu">
+    <Fragment>
       <div className="output-selector">
         <img
-          onClick={() => setMenuOpen(true)}
+          onClick={() => {
+            setSelectMaterialMenuOpen(true);
+            setresultListMenuopen(true);
+          }}
           className="output-selector__item"
           src={itemImage(state.target.item)}
         />
-        {menuOpen && (
+        {selectMaterialMenuOpen && (
           <div className="output-selector__menu" ref={menuRef}>
             {[...Object.values(Items), ...Object.values(Liquids)].map(i => (
               <img
@@ -35,7 +40,7 @@ export default function Menu({ state }: { state: AppState }) {
                 onClick={() => {
                   state.setTarget(new ItemStack(i, state.target.count));
                   state.setActive(0);
-                  setMenuOpen(false);
+                  setSelectMaterialMenuOpen(false);
                 }}
                 src={itemImage(i)}
               />
@@ -63,26 +68,35 @@ export default function Menu({ state }: { state: AppState }) {
             </option>
           ))}
         </select>
+        <HamburgerButton
+          isOpen={resultListMenuopen}
+          onClick={() => {
+            setresultListMenuopen(!resultListMenuopen);
+          }}
+        />
       </div>
-      {state.results &&
-        state.results.map((s, index) => {
-          return (
-            <div
-              className="menu-item "
-              data-active={index == state.active}
-              onClick={() => {
-                state.setActive(index);
-              }}
-            >
-              {s.baseInputs.map(i => (
-                <div>
-                  {i && i.count && i.count.toFixed(2)} {i.item.name}
-                </div>
-              ))}
-              {s.totalPower > 0 && <div>{s.totalPower.toFixed(0)} power</div>}
-            </div>
-          );
-        })}
-    </div>
+      <div className="result-list" data-is-open={resultListMenuopen}>
+        {state.results &&
+          state.results.map((s, index) => {
+            return (
+              <div
+                className="menu-item "
+                data-active={index == state.active}
+                onClick={() => {
+                  state.setActive(index);
+                  setresultListMenuopen(false);
+                }}
+              >
+                {s.baseInputs.map(i => (
+                  <div>
+                    {i && i.count && i.count.toFixed(2)} {i.item.name}
+                  </div>
+                ))}
+                {s.totalPower > 0 && <div>{s.totalPower.toFixed(0)} power</div>}
+              </div>
+            );
+          })}
+      </div>
+    </Fragment>
   );
 }

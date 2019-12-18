@@ -1,0 +1,31 @@
+.hamburger-button {
+  display: inline-block;
+  cursor: pointer;
+  margin-right: 6px;
+
+  @include medium {
+    display:none;
+  }
+}
+
+.hamburger-button__bar1, .hamburger-button__bar2, .hamburger-button__bar3 {
+  width: 24px;
+  height: 3px;
+  background-color: $lighter;
+  margin: 3px 0;
+  transition: 0.4s;
+}
+
+.hamburger-button[data-is-open] {
+  .hamburger-button__bar1 {
+    transform: rotate(-45deg) translate(-4px, 4px) ;
+  }
+
+  .hamburger-button__bar2 {
+    opacity: 0;
+  }
+
+  .hamburger-button__bar3 {
+    transform: rotate(45deg) translate(-4px, -4px) ;
+  }
+}

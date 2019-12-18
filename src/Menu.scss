@@ -1,0 +1,89 @@
+.output-selector {
+  display: flex;
+  align-items: center;
+  position: relative;
+  background-color: $fill;
+  grid-area: search;
+
+  .output-selector__menu {
+    position: absolute;
+    top: 30px;
+    left: 0px;
+    background-color: $lighter;
+    margin: 5px;
+    padding: 1px;
+    border-radius: 3px;
+
+    box-shadow: 0 2px 1px rgba(0, 0, 0, 0.09), 0 4px 2px rgba(0, 0, 0, 0.09),
+      0 8px 4px rgba(0, 0, 0, 0.09), 0 16px 8px rgba(0, 0, 0, 0.09),
+      0 32px 16px rgba(0, 0, 0, 0.09);
+  }
+
+  .output-selector__item {
+    background-color: $lighter;
+    margin: 5px;
+    width: 24px;
+    height: 24px;
+    border-radius: 3px;
+    cursor: pointer;
+
+    .output-selector__menu__item {
+      background-color: rgba(0, 0, 0, 0.3);
+      margin: 2px;
+      border-radius: 3px;
+    }
+
+    .output-selector__menu__item[data-selected],
+    .output-selector__menu__item:hover {
+      background-color: rgba(0, 0, 255, 0.3);
+    }
+  }
+
+  .output-selector__count {
+    height: 24px;
+    background-color: $lighter;
+    border: none;
+    margin: 5px;
+    width: 50px;
+    flex-grow: 1;
+  }
+
+  .output-selector__sort {
+    width: 100px;
+    height: 24px;
+    margin: 5px;
+    color: #333;
+    border: none;
+    background-color: $lighter;
+  }
+}
+
+.result-list {
+  overflow-x: hidden;
+  overflow-y: auto;
+  background-color: $fill;
+  grid-area: results;
+  display: none;
+
+  &[data-is-open] {
+    display: block;
+  }
+
+  @include medium {
+    display: block;
+  }
+
+  .menu-item {
+    background-color: $lighter;
+    margin: 5px;
+    color: #1e2022;
+    cursor: pointer;
+    border-radius: 3px;
+    padding: 0px 5px;
+  }
+
+  .menu-item:hover,
+  .menu-item[data-active] {
+    background-color: $text;
+  }
+}

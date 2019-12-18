@@ -1,4 +1,4 @@
-@import 'normalize.css/normalize.css';
+@import "normalize.css/normalize.css";
 
 $background: #1e2022;
 $fill: #52616b;
@@ -8,182 +8,141 @@ $belt-border: #989aa4;
 $belt-width: 16px;
 $block-size: 64px;
 
+// Small tablets and large smartphones (landscape view)
+$screen-small-min: 576px;
+@mixin small {
+  @media (min-width: #{$screen-small-min}) {
+    @content;
+  }
+}
+
+// Small tablets (portrait view)
+$screen-medium-min: 768px;
+@mixin medium {
+  @media (min-width: #{$screen-medium-min}) {
+    @content;
+  }
+}
+
+// Tablets and small desktops
+$screen-large-min: 992px;
+@mixin large {
+  @media (min-width: #{$screen-large-min}) {
+    @content;
+  }
+}
+
+// Large tablets and desktops
+$screen-desktop-min: 1200px;
+@mixin desktop {
+  @media (min-width: #{$screen-desktop-min}) {
+    @content;
+  }
+}
+
+@import "src/HamburgerButton.scss";
+@import "src/Menu.scss";
+
 body {
-    background-color: #212121;
-    color: $text;
+  background-color: #212121;
+  color: $text;
 }
 
 .block {
-    position: absolute;
-    width: $block-size;
-    height: $block-size;
-    background-color: $fill;
-    background-size: 100%;
-    border: 2px solid $belt-border;
-    display:flex;
-    justify-content: center;
-    align-items: center;
-    text-align:center;
-    transform: translate(-$block-size/2, -$block-size/2 + $belt-width/2);
-    z-index: 1;
+  position: absolute;
+  width: $block-size;
+  height: $block-size;
+  background-color: $fill;
+  background-size: 100%;
+  border: 2px solid $belt-border;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  transform: translate(-$block-size/2, -$block-size/2 + $belt-width/2);
+  z-index: 1;
 
-    &-label {
-        background-color: rgba(0,0,0, .5);
-        font-size: 13px;
-    }
+  &-label {
+    background-color: rgba(0, 0, 0, 0.5);
+    font-size: 13px;
+  }
 }
 
 .root {
-    display: grid;
+  display: grid;
+
+  //grid-template-rows: minmax(fit-content, 100%) auto;
+  //grid-template-columns: 1fr;
+
+  grid-template-rows: min-content min-content auto;
+  grid-template-areas:
+    "search"
+    "results"
+    "solution";
+
+  @include medium {
     grid-template-columns: 300px auto;
-    height: 100%;
-}
-
-.menu {
-    background-color: $fill;
-    width: 100%;
-    height: 100%;
-    overflow: scroll;
-    overflow-x: hidden;
-
-    h3 {
-        margin: 5px 0;
-    }
-
-    box-shadow: 0 2px 1px rgba(0,0,0,0.09),
-    0 4px 2px rgba(0,0,0,0.09),
-    0 8px 4px rgba(0,0,0,0.09),
-    0 16px 8px rgba(0,0,0,0.09),
-    0 32px 16px rgba(0,0,0,0.09);
-}
-
-.menu-item {
-    background-color: $lighter;
-    margin: 5px;
-    color: #1e2022;
-    cursor: pointer;
-    border-radius: 3px;
-    padding: 0px 5px;
-}
-
-.menu-item:hover, .menu-item[data-active] {
-    background-color: $text;
+    grid-template-rows: min-content auto;
+    grid-template-areas:
+      "search solution"
+      "results solution";
+    //grid-template-rows: 1fr;
+  }
+  height: 100%;
 }
 
 .graph {
-    position: relative;
+  grid-area: solution;
+  position: relative;
 }
 
 .hover-card {
-    position: absolute;
-    top:$block-size+4;
-    left: -2px;
-    background-color: $lighter;
-    padding: 5px;
-    border-radius: 3px;
-    box-shadow: 0 2px 1px rgba(0,0,0,0.09),
-    0 4px 2px rgba(0,0,0,0.09),
-    0 8px 4px rgba(0,0,0,0.09),
-    0 16px 8px rgba(0,0,0,0.09),
-    0 32px 16px rgba(0,0,0,0.09);
-    color: #333;
-    z-index: 10;
+  position: absolute;
+  top: $block-size + 4;
+  left: -2px;
+  background-color: $lighter;
+  padding: 5px;
+  border-radius: 3px;
+  box-shadow: 0 2px 1px rgba(0, 0, 0, 0.09), 0 4px 2px rgba(0, 0, 0, 0.09),
+    0 8px 4px rgba(0, 0, 0, 0.09), 0 16px 8px rgba(0, 0, 0, 0.09),
+    0 32px 16px rgba(0, 0, 0, 0.09);
+  color: #333;
+  z-index: 10;
 
-    opacity: 0;
+  opacity: 0;
 }
 
 table {
-    color: inherit;
+  color: inherit;
 }
 
 .hover-target:hover {
-    .hover-card {
-        opacity: .7;
-    }
+  .hover-card {
+    opacity: 0.7;
+  }
 }
 
 .link {
-    height: $belt-width;
-    position: absolute;
-    border-left: 1px dashed red;
-    transform-origin: 0% 50%;
-    background: url("../public/mindustry/sprites/blocks/distribution/conveyors/conveyor-0-0.png");
-    background-size: $belt-width $belt-width;
-    box-sizing: border-box;
-    text-align: center;
-    z-index: 0;
-}
-
-.output-selector {
-    display: flex;
-    align-items: center;
-    position: relative;
-}
-
-.output-selector__item {
-    background-color: $lighter;
-    margin: 5px;
-    width: 24px;
-    height: 24px;
-    border-radius: 3px;
-    cursor: pointer;
-}
-
-.output-selector__count {
-    height: 24px;
-    background-color: $lighter;
-    border: none;
-    margin: 5px;
-    width: 50px;
-    flex-grow: 1;
-}
-
-.output-selector__sort {
-    width: 100px;
-    height: 24px;
-    margin: 5px;
-    color: #333;
-    border: none;
-    background-color: $lighter;
-}
-
-.output-selector__menu {
-    position: absolute;
-    top: 30px;
-    left: 0px;
-    background-color: $lighter;
-    margin: 5px;
-    padding: 1px;
-    border-radius: 3px;
-
-    box-shadow: 0 2px 1px rgba(0,0,0,0.09),
-    0 4px 2px rgba(0,0,0,0.09),
-    0 8px 4px rgba(0,0,0,0.09),
-    0 16px 8px rgba(0,0,0,0.09),
-    0 32px 16px rgba(0,0,0,0.09);
-}
-
-.output-selector__menu__item {
-    background-color: rgba(0,0,0,0.3);
-    margin: 2px;
-    border-radius: 3px;
-}
-
-.output-selector__menu__item[data-selected], .output-selector__menu__item:hover {
-    background-color: rgba(0,0,255,0.3);
+  height: $belt-width;
+  position: absolute;
+  border-left: 1px dashed red;
+  transform-origin: 0% 50%;
+  background: url("../public/mindustry/sprites/blocks/distribution/conveyors/conveyor-0-0.png");
+  background-size: $belt-width $belt-width;
+  box-sizing: border-box;
+  text-align: center;
+  z-index: 0;
 }
 
 .link-text {
-    position: relative;
+  position: relative;
 }
 
 .link-item {
-    height: $belt-width * 1.5;
-    width: $belt-width * 1.5;
-    transform: translate(0, -$belt-width/4);
+  height: $belt-width * 1.5;
+  width: $belt-width * 1.5;
+  transform: translate(0, -$belt-width/4);
 
-    filter: drop-shadow(1px 0 0 black)
-    drop-shadow(-1px 0 0 black)
-    drop-shadow(0 1px 0 black)
-    drop-shadow(0 -1px 0 black);
+  filter: drop-shadow(1px 0 0 black) drop-shadow(-1px 0 0 black)
+    drop-shadow(0 1px 0 black) drop-shadow(0 -1px 0 black);
 }
