@@ -55,7 +55,7 @@ export default function Block({
         </tr>
         <tr>
           <td>od+phase</td>
-          <td>{(block.data.count / 2.125).toFixed(2)}</td>
+          <td>{(block.data.count / 2.25).toFixed(2)}</td>
         </tr>
         <tr>
           <td>power</td>
